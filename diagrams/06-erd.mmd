@@ -1,0 +1,166 @@
+erDiagram
+  USER ||--o{ INCIDENT : reports
+  USER ||--o{ VERIFICATION : casts
+  USER ||--o{ COMMENT : writes
+  USER ||--o{ WATCH_ZONE : owns
+  USER ||--o{ NOTIFICATION : receives
+  USER ||--o{ ABUSE_FLAG : files
+  AUTHORITY |o--o{ USER : "employs staff"
+  AREA |o--o{ USER : "home of"
+  CATEGORY ||--o{ INCIDENT : classifies
+  AREA ||--o{ INCIDENT : contains
+  AREA ||--o{ JURISDICTION : "covered by"
+  AUTHORITY ||--o{ JURISDICTION : covers
+  AUTHORITY ||--o{ REFERRAL : handles
+  INCIDENT ||--o{ INCIDENT_MEDIA : has
+  INCIDENT ||--o{ VERIFICATION : receives
+  INCIDENT ||--o{ COMMENT : "thread of"
+  INCIDENT ||--o| REFERRAL : "referred via"
+  INCIDENT ||--o{ STATUS_EVENT : history
+  INCIDENT ||--o| SOS_ALERT : triggers
+  SOS_ALERT ||--o{ NOTIFICATION : "fans out"
+  INCIDENT ||--o{ NOTIFICATION : about
+  COMMENT ||--o{ COMMENT : replies
+
+  USER {
+    uuid id PK
+    string display_name
+    string phone UK "mock OTP"
+    enum role "citizen, authority, admin"
+    enum lang "en, bn"
+    uuid home_area_id FK
+    uuid authority_id FK "nullable"
+    timestamp created_at
+  }
+  AREA {
+    uuid id PK
+    string name_en
+    string name_bn
+    string city_corp "DNCC or DSCC"
+    float centroid_lat
+    float centroid_lng
+    json boundary "optional polygon"
+  }
+  AUTHORITY {
+    uuid id PK
+    string name_en
+    string name_bn
+    enum type "police, traffic, city_corp, wasa"
+    string contact_phone
+  }
+  JURISDICTION {
+    uuid authority_id FK
+    uuid area_id FK
+  }
+  CATEGORY {
+    uuid id PK
+    string key UK
+    string name_en
+    string name_bn
+    enum default_urgency "low to critical"
+    enum authority_type "nullable"
+    bool triggers_sos
+    bool is_blocked "serious crime redirect"
+    string redirect_hotline "999 or 109"
+  }
+  INCIDENT {
+    uuid id PK
+    uuid reporter_id FK "always stored"
+    uuid category_id FK
+    uuid area_id FK
+    string title
+    text description
+    enum urgency "low, medium, high, critical"
+    enum status "open to closed, removed"
+    enum verification "unverified, verified, disputed"
+    bool is_anonymous "hidden from public only"
+    float lat
+    float lng
+    string address_text
+    int confirm_count
+    int dispute_count
+    timestamp occurred_at
+    timestamp created_at
+  }
+  INCIDENT_MEDIA {
+    uuid id PK
+    uuid incident_id FK
+    string url
+    bool public_hidden
+    timestamp created_at
+  }
+  VERIFICATION {
+    uuid id PK
+    uuid incident_id FK
+    uuid user_id FK "unique per incident"
+    enum vote "confirm, dispute"
+    string note
+    timestamp created_at
+  }
+  COMMENT {
+    uuid id PK
+    uuid incident_id FK
+    uuid author_id FK
+    uuid parent_id FK "nullable"
+    enum kind "comment, update, sighting, offer_help, official"
+    text body
+    bool is_anonymous
+    bool is_hidden
+    timestamp created_at
+  }
+  REFERRAL {
+    uuid id PK
+    uuid incident_id FK
+    uuid authority_id FK
+    enum source "auto, admin"
+    timestamp referred_at
+    timestamp acknowledged_at
+    timestamp resolved_at
+    text resolution_note
+  }
+  STATUS_EVENT {
+    uuid id PK
+    uuid incident_id FK
+    uuid actor_id FK
+    string from_status
+    string to_status
+    text note
+    timestamp created_at
+  }
+  WATCH_ZONE {
+    uuid id PK
+    uuid user_id FK
+    string label
+    float center_lat
+    float center_lng
+    int radius_m
+    enum min_urgency "low to critical"
+  }
+  SOS_ALERT {
+    uuid id PK
+    uuid incident_id FK
+    float center_lat
+    float center_lng
+    int radius_m "default 3000"
+    enum state "active, found, cancelled, expired"
+    timestamp issued_at
+    timestamp expires_at
+  }
+  NOTIFICATION {
+    uuid id PK
+    uuid user_id FK
+    uuid incident_id FK
+    uuid sos_alert_id FK "nullable"
+    enum type "sos, watch_zone, status_change, reply, sighting"
+    string title
+    timestamp read_at
+    timestamp created_at
+  }
+  ABUSE_FLAG {
+    uuid id PK
+    enum target_type "incident, comment"
+    uuid target_id
+    uuid flagged_by FK
+    string reason
+    enum state "open, actioned, dismissed"
+  }

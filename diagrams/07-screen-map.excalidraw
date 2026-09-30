@@ -1,0 +1,693 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "gstack-lite/diagram",
+  "elements": [
+    {
+      "id": "L",
+      "type": "rectangle",
+      "groupIds": [],
+      "x": 866.953125,
+      "y": 8,
+      "width": 260,
+      "height": 90,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "Welcome + language pick",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "LG",
+      "type": "rectangle",
+      "groupIds": [],
+      "x": 866.953125,
+      "y": 148,
+      "width": 260,
+      "height": 120,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "Mock login: phone + OTP<br>or demo role switcher",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "MAP",
+      "type": "rectangle",
+      "groupIds": [],
+      "x": 410.72265625,
+      "y": 318,
+      "width": 165.734375,
+      "height": 60,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "Map (home)",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "ID",
+      "type": "rectangle",
+      "groupIds": [],
+      "x": 634.859375,
+      "y": 598,
+      "width": 260,
+      "height": 90,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "Incident detail + thread",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "RP",
+      "type": "rectangle",
+      "groupIds": [],
+      "x": 8,
+      "y": 458,
+      "width": 247.65625,
+      "height": 60,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "Report flow (3 steps)",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "FD",
+      "type": "rectangle",
+      "groupIds": [],
+      "x": 691.171875,
+      "y": 458,
+      "width": 147.375,
+      "height": 60,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "Area feed",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "DB",
+      "type": "rectangle",
+      "groupIds": [],
+      "x": 325.65625,
+      "y": 458,
+      "width": 153.109375,
+      "height": 60,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "Dashboard",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "AL",
+      "type": "rectangle",
+      "groupIds": [],
+      "x": 528.765625,
+      "y": 458,
+      "width": 112.40625,
+      "height": 60,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "Alerts",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "ME",
+      "type": "rectangle",
+      "groupIds": [],
+      "x": 1448.375,
+      "y": 428,
+      "width": 260,
+      "height": 120,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "Me: my reports, watch zones, language",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "WZ",
+      "type": "rectangle",
+      "groupIds": [],
+      "x": 1466.625,
+      "y": 613,
+      "width": 223.5,
+      "height": 60,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "Watch zone editor",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "AC",
+      "type": "rectangle",
+      "groupIds": [],
+      "x": 888.546875,
+      "y": 458,
+      "width": 216.8125,
+      "height": 60,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "Authority console",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "AQ",
+      "type": "rectangle",
+      "groupIds": [],
+      "x": 1155.359375,
+      "y": 458,
+      "width": 243.015625,
+      "height": 60,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "Admin review queue",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "L_LG",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 996.953,
+      "y": 98,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          25
+        ],
+        [
+          0,
+          46
+        ]
+      ],
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "L"
+      },
+      "end": {
+        "id": "LG"
+      }
+    },
+    {
+      "id": "LG_MAP",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 866.953,
+      "y": 229.952,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -373.363,
+          63.048
+        ],
+        [
+          -373.363,
+          84.048
+        ]
+      ],
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "LG"
+      },
+      "end": {
+        "id": "MAP"
+      }
+    },
+    {
+      "id": "MAP_ID",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 410.723,
+      "y": 370.459,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -120.06700000000001,
+          32.541
+        ],
+        [
+          -120.06700000000001,
+          117.541
+        ],
+        [
+          -120.06700000000001,
+          202.541
+        ],
+        [
+          220.17900000000003,
+          252.767
+        ]
+      ],
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "MAP"
+      },
+      "end": {
+        "id": "ID"
+      }
+    },
+    {
+      "id": "MAP_RP",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 410.723,
+      "y": 360.599,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -278.895,
+          42.40100000000001
+        ],
+        [
+          -278.895,
+          93.40100000000001
+        ]
+      ],
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "MAP"
+      },
+      "end": {
+        "id": "RP"
+      }
+    },
+    {
+      "id": "MAP_FD",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 576.457,
+      "y": 364.801,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          188.40200000000004,
+          38.19900000000001
+        ],
+        [
+          188.40200000000004,
+          89.19900000000001
+        ]
+      ],
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "MAP"
+      },
+      "end": {
+        "id": "FD"
+      }
+    },
+    {
+      "id": "MAP_DB",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 443.747,
+      "y": 378,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -41.536,
+          25
+        ],
+        [
+          -41.536,
+          76
+        ]
+      ],
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "MAP"
+      },
+      "end": {
+        "id": "DB"
+      }
+    },
+    {
+      "id": "MAP_AL",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 543.433,
+      "y": 378,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          41.53600000000006,
+          25
+        ],
+        [
+          41.53600000000006,
+          76
+        ]
+      ],
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "MAP"
+      },
+      "end": {
+        "id": "AL"
+      }
+    },
+    {
+      "id": "MAP_ME",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 576.457,
+      "y": 352.201,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          1001.918,
+          50.79899999999998
+        ],
+        [
+          1001.918,
+          71.79899999999998
+        ]
+      ],
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "MAP"
+      },
+      "end": {
+        "id": "ME"
+      }
+    },
+    {
+      "id": "AL_ID",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 584.969,
+      "y": 518,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          55
+        ],
+        [
+          60.519000000000005,
+          78.54899999999998
+        ]
+      ],
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "AL"
+      },
+      "end": {
+        "id": "ID"
+      }
+    },
+    {
+      "id": "FD_ID",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 764.859,
+      "y": 518,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          55
+        ],
+        [
+          0,
+          76
+        ]
+      ],
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "FD"
+      },
+      "end": {
+        "id": "ID"
+      }
+    },
+    {
+      "id": "ME_WZ",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 1578.375,
+      "y": 548,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          25
+        ],
+        [
+          0,
+          61
+        ]
+      ],
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "ME"
+      },
+      "end": {
+        "id": "WZ"
+      }
+    },
+    {
+      "id": "LG_AC",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 996.953,
+      "y": 268,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          25
+        ],
+        [
+          0,
+          80
+        ],
+        [
+          0,
+          135
+        ],
+        [
+          0,
+          186
+        ]
+      ],
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "LG"
+      },
+      "end": {
+        "id": "AC"
+      }
+    },
+    {
+      "id": "AC_ID",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 996.953,
+      "y": 518,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          55
+        ],
+        [
+          -98.26400000000001,
+          84.63699999999994
+        ]
+      ],
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "AC"
+      },
+      "end": {
+        "id": "ID"
+      }
+    },
+    {
+      "id": "LG_AQ",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 1126.953,
+      "y": 247.476,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          149.914,
+          45.524
+        ],
+        [
+          149.914,
+          100.524
+        ],
+        [
+          149.914,
+          155.524
+        ],
+        [
+          149.914,
+          206.524
+        ]
+      ],
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "LG"
+      },
+      "end": {
+        "id": "AQ"
+      }
+    },
+    {
+      "id": "AQ_ID",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 1276.867,
+      "y": 518,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          55
+        ],
+        [
+          -378.044,
+          106.68499999999995
+        ]
+      ],
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "AQ"
+      },
+      "end": {
+        "id": "ID"
+      }
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {}
+}

@@ -1,0 +1,16 @@
+sequenceDiagram
+  participant P as Parent (reporter)
+  participant S as ShoMap
+  participant N as Nearby users
+  participant A as Police thana
+  participant M as Admin
+  P->>S: Report missing child (photo, last seen, clothing)
+  S->>S: Urgency = Critical, create SOS alert (3 km, 72h)
+  S->>N: Real-time SOS banner + notification
+  S->>A: Immediate referral (critical)
+  S->>M: Flag for review (fake-alert guard)
+  N->>S: Sighting comment with location
+  S->>P: Notify sighting
+  A->>S: Acknowledge, in progress
+  P->>S: Mark FOUND
+  S->>N: Alert closed, photo hidden from public

@@ -1,0 +1,16 @@
+graph TD
+  L["Welcome + language pick"] --> LG["Mock login: phone + OTP<br/>or demo role switcher"]
+  LG --> MAP["Map (home)"]
+  MAP --> ID["Incident detail + thread"]
+  MAP --> RP["Report flow (3 steps)"]
+  MAP --> FD["Area feed"]
+  MAP --> DB["Dashboard"]
+  MAP --> AL["Alerts"]
+  MAP --> ME["Me: my reports, watch zones, language"]
+  AL --> ID
+  FD --> ID
+  ME --> WZ["Watch zone editor"]
+  LG --> AC["Authority console"]
+  AC --> ID
+  LG --> AQ["Admin review queue"]
+  AQ --> ID

@@ -1,0 +1,21 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "gstack-lite/diagram",
+  "elements": [
+    {
+      "type": "image",
+      "x": 0,
+      "y": 0,
+      "width": 299.96875,
+      "height": 201.53125,
+      "status": "saved",
+      "fileId": "FtMEof3-ilSu8z-14jpmD"
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {}
+}

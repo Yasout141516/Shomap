@@ -1,0 +1,17 @@
+graph TD
+  R["Citizen taps Report"] --> K{"Category is<br/>serious crime?"}
+  K -->|"yes"| X["Show Call 999 / 109<br/>no pin created"]
+  K -->|"no"| F["Fill: category, location,<br/>urgency, description, photos,<br/>anonymous toggle"]
+  F --> P["Incident created<br/>status open, unverified"]
+  P --> Q{"Missing child<br/>SOS category?"}
+  Q -->|"yes"| SOS["Critical: SOS alert to radius<br/>+ immediate referral<br/>+ admin review flag"]
+  Q -->|"no"| V["Community verifies<br/>confirm / dispute"]
+  V -->|"3+ confirms"| VD["Verified"]
+  V -->|"disputes win"| AD["Admin review queue"]
+  AD -->|"approve"| VD
+  AD -->|"reject"| H["Removed from map"]
+  VD --> RF["Referred to matching authority"]
+  SOS --> RF
+  RF --> AU["Authority: acknowledged,<br/>in progress, resolved"]
+  AU --> TH["Official update posted<br/>to incident thread"]
+  TH --> W["Watchers notified"]

@@ -1,0 +1,533 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "gstack-lite/diagram",
+  "elements": [
+    {
+      "id": "I",
+      "type": "rectangle",
+      "groupIds": [],
+      "x": 242.44921875,
+      "y": 8,
+      "width": 260,
+      "height": 90,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "New incident: unverified",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "VOTE",
+      "type": "rectangle",
+      "groupIds": [],
+      "x": 258.33984375,
+      "y": 148,
+      "width": 228.21875,
+      "height": 90,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "Another user votes<br>confirm or dispute",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "G",
+      "type": "diamond",
+      "groupIds": [],
+      "x": 250.44140625,
+      "y": 288,
+      "width": 245.015625,
+      "height": 245.015625,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "Voter is reporter<br>or already voted?",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "BL",
+      "type": "rectangle",
+      "groupIds": [],
+      "x": 105.1640625,
+      "y": 613.015625,
+      "width": 260,
+      "height": 90,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "Blocked, reason shown",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "CT",
+      "type": "rectangle",
+      "groupIds": [],
+      "x": 415.1640625,
+      "y": 628.015625,
+      "width": 189.140625,
+      "height": 60,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "Update counts",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "C1",
+      "type": "diamond",
+      "groupIds": [],
+      "x": 350.234375,
+      "y": 753.015625,
+      "width": 320,
+      "height": 320,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "confirms >= 3 AND<br>confirms >= 2x disputes?",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "VER",
+      "type": "rectangle",
+      "groupIds": [],
+      "x": 59.734375,
+      "y": 1273.5,
+      "width": 260,
+      "height": 90,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "verified: badge + referral",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "C2",
+      "type": "diamond",
+      "groupIds": [],
+      "x": 397.38671875,
+      "y": 1183.015625,
+      "width": 270.96875,
+      "height": 270.96875,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "disputes >= 3 AND<br>disputes > confirms?",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "DIS",
+      "type": "rectangle",
+      "groupIds": [],
+      "x": 261.9453125,
+      "y": 1533.984375,
+      "width": 260,
+      "height": 120,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "disputed: admin queue,<br>greyed pin",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "WAIT",
+      "type": "rectangle",
+      "groupIds": [],
+      "x": 571.9453125,
+      "y": 1563.984375,
+      "width": 201.703125,
+      "height": 60,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "stays unverified",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "ADM",
+      "type": "rectangle",
+      "groupIds": [],
+      "x": 8,
+      "y": 883.015625,
+      "width": 229.03125,
+      "height": 60,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "Admin or authority",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "I_VOTE",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 372.449,
+      "y": 98,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          25
+        ],
+        [
+          0,
+          46
+        ]
+      ],
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "I"
+      },
+      "end": {
+        "id": "VOTE"
+      }
+    },
+    {
+      "id": "VOTE_G",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 372.449,
+      "y": 238,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          25
+        ],
+        [
+          0,
+          46
+        ]
+      ],
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "VOTE"
+      },
+      "end": {
+        "id": "G"
+      }
+    },
+    {
+      "id": "G_BL",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 316.349,
+      "y": 476.915,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -81.185,
+          96.10099999999994
+        ],
+        [
+          -81.185,
+          132.10099999999994
+        ]
+      ],
+      "label": {
+        "text": "yes",
+        "fontSize": 20,
+        "groupIds": []
+      },
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "G"
+      },
+      "end": {
+        "id": "BL"
+      }
+    },
+    {
+      "id": "G_CT",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 428.55,
+      "y": 476.915,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          81.18399999999997,
+          96.10099999999994
+        ],
+        [
+          81.18399999999997,
+          147.10099999999994
+        ]
+      ],
+      "label": {
+        "text": "no",
+        "fontSize": 20,
+        "groupIds": []
+      },
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "G"
+      },
+      "end": {
+        "id": "CT"
+      }
+    },
+    {
+      "id": "CT_C1",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 509.734,
+      "y": 688.016,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          40
+        ],
+        [
+          0,
+          61
+        ]
+      ],
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "CT"
+      },
+      "end": {
+        "id": "C1"
+      }
+    },
+    {
+      "id": "C1_VER",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 442.023,
+      "y": 1005.305,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -90.031,
+          122.71100000000013
+        ],
+        [
+          -211.36300000000003,
+          265.15
+        ]
+      ],
+      "label": {
+        "text": "yes",
+        "fontSize": 20,
+        "groupIds": []
+      },
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "C1"
+      },
+      "end": {
+        "id": "VER"
+      }
+    },
+    {
+      "id": "C1_C2",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 524.976,
+      "y": 1057.774,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          7.394999999999982,
+          70.24200000000019
+        ],
+        [
+          7.394999999999982,
+          121.24200000000019
+        ]
+      ],
+      "label": {
+        "text": "no",
+        "fontSize": 20,
+        "groupIds": []
+      },
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "C1"
+      },
+      "end": {
+        "id": "C2"
+      }
+    },
+    {
+      "id": "C2_DIS",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 472.147,
+      "y": 1393.76,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -80.202,
+          100.22399999999993
+        ],
+        [
+          -80.202,
+          136.22399999999993
+        ]
+      ],
+      "label": {
+        "text": "yes",
+        "fontSize": 20,
+        "groupIds": []
+      },
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "C2"
+      },
+      "end": {
+        "id": "DIS"
+      }
+    },
+    {
+      "id": "C2_WAIT",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 592.595,
+      "y": 1393.76,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          80.202,
+          100.22399999999993
+        ],
+        [
+          80.202,
+          166.22399999999993
+        ]
+      ],
+      "label": {
+        "text": "no",
+        "fontSize": 20,
+        "groupIds": []
+      },
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "C2"
+      },
+      "end": {
+        "id": "WAIT"
+      }
+    },
+    {
+      "id": "ADM_VER",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 122.516,
+      "y": 943.016,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          185.0000000000001
+        ],
+        [
+          50.007999999999996,
+          326.7120000000001
+        ]
+      ],
+      "label": {
+        "text": "manual verify / reject",
+        "fontSize": 20,
+        "groupIds": []
+      },
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "ADM"
+      },
+      "end": {
+        "id": "VER"
+      }
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {}
+}

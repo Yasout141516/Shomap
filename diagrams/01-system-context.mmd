@@ -1,0 +1,10 @@
+graph LR
+  C["Citizen / Reporter"] -->|"report, verify, comment"| S(("ShoMap"))
+  N["Community Member"] -->|"confirm / dispute, help"| S
+  S -->|"referral queue"| A["Authority<br/>Police thana / Traffic / City Corp"]
+  A -->|"acknowledge, update, resolve"| S
+  M["ShoMap Admin / Moderator"] -->|"review, hide, verify"| S
+  S -->|"map, feed, dashboard"| C
+  S -->|"SOS + watch-zone alerts"| N
+  S -.->|"serious crime: redirect only"| E["999 / 109 helplines"]
+  S -->|"map tiles"| T["Map tile provider"]

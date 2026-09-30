@@ -1,0 +1,13 @@
+stateDiagram-v2
+  [*] --> open: citizen submits
+  open --> referred: verified OR critical
+  open --> removed: admin rejects / unverified 7d
+  referred --> acknowledged: authority accepts
+  referred --> open: authority redirects
+  acknowledged --> in_progress: work started
+  in_progress --> resolved: resolved with note
+  acknowledged --> resolved: quick fix
+  resolved --> closed: community confirms OR 72h
+  resolved --> in_progress: 3+ users say still happening
+  closed --> [*]
+  removed --> [*]

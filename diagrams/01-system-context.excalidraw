@@ -1,0 +1,449 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "gstack-lite/diagram",
+  "elements": [
+    {
+      "id": "C",
+      "type": "rectangle",
+      "groupIds": [],
+      "x": 26.4140625,
+      "y": 103,
+      "width": 223.171875,
+      "height": 60,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "Citizen / Reporter",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "S",
+      "type": "ellipse",
+      "groupIds": [],
+      "x": 518,
+      "y": 179.4375,
+      "width": 82.125,
+      "height": 82.125,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "ShoMap",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "N",
+      "type": "rectangle",
+      "groupIds": [],
+      "x": 860.71875,
+      "y": 190.5,
+      "width": 238.8125,
+      "height": 60,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "Community Member",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "A",
+      "type": "rectangle",
+      "groupIds": [],
+      "x": 850.125,
+      "y": 8,
+      "width": 260,
+      "height": 120,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "Authority<br>Police thana / Traffic / City Corp",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "M",
+      "type": "rectangle",
+      "groupIds": [],
+      "x": 8,
+      "y": 213,
+      "width": 260,
+      "height": 90,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "ShoMap Admin / Moderator",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "E",
+      "type": "rectangle",
+      "groupIds": [],
+      "x": 864.171875,
+      "y": 325.5,
+      "width": 231.90625,
+      "height": 60,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "999 / 109 helplines",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "T",
+      "type": "rectangle",
+      "groupIds": [],
+      "x": 873.46875,
+      "y": 435.5,
+      "width": 213.3125,
+      "height": 60,
+      "strokeWidth": 2,
+      "label": {
+        "groupIds": [],
+        "text": "Map tile provider",
+        "fontSize": 20
+      },
+      "link": null
+    },
+    {
+      "id": "C_S",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 249.586,
+      "y": 133,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          143.414,
+          0
+        ],
+        [
+          269.61,
+          66.494
+        ]
+      ],
+      "label": {
+        "text": "report, verify, comment",
+        "fontSize": 20,
+        "groupIds": []
+      },
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "C"
+      },
+      "end": {
+        "id": "S"
+      }
+    },
+    {
+      "id": "N_S",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 860.719,
+      "y": 239.23,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -135.59400000000005,
+          21.27000000000001
+        ],
+        [
+          -257.8470000000001,
+          -8.176999999999992
+        ]
+      ],
+      "label": {
+        "text": "confirm / dispute, help",
+        "fontSize": 20,
+        "groupIds": []
+      },
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "N"
+      },
+      "end": {
+        "id": "S"
+      }
+    },
+    {
+      "id": "S_A",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 586.492,
+      "y": 189.943,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          138.63300000000004,
+          -154.443
+        ],
+        [
+          259.6650000000001,
+          -139.017
+        ]
+      ],
+      "label": {
+        "text": "referral queue",
+        "fontSize": 20,
+        "groupIds": []
+      },
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "S"
+      },
+      "end": {
+        "id": "A"
+      }
+    },
+    {
+      "id": "A_S",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 850.125,
+      "y": 84.569,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -125,
+          15.930999999999997
+        ],
+        [
+          -254.538,
+          109.538
+        ]
+      ],
+      "label": {
+        "text": "acknowledge, update, resolve",
+        "fontSize": 20,
+        "groupIds": []
+      },
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "A"
+      },
+      "end": {
+        "id": "S"
+      }
+    },
+    {
+      "id": "M_S",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 268,
+      "y": 258,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          125,
+          0
+        ],
+        [
+          247.10699999999997,
+          -27.574000000000012
+        ]
+      ],
+      "label": {
+        "text": "review, hide, verify",
+        "fontSize": 20,
+        "groupIds": []
+      },
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "M"
+      },
+      "end": {
+        "id": "S"
+      }
+    },
+    {
+      "id": "S_C",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 522.734,
+      "y": 239.642,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -129.73400000000004,
+          68.358
+        ],
+        [
+          -337.72200000000004,
+          -74.37899999999999
+        ]
+      ],
+      "label": {
+        "text": "map, feed, dashboard",
+        "fontSize": 20,
+        "groupIds": []
+      },
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "S"
+      },
+      "end": {
+        "id": "C"
+      }
+    },
+    {
+      "id": "S_N",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 598.983,
+      "y": 210.884,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          126.14200000000005,
+          -30.383999999999986
+        ],
+        [
+          257.7840000000001,
+          -9.73399999999998
+        ]
+      ],
+      "label": {
+        "text": "SOS + watch-zone alerts",
+        "fontSize": 20,
+        "groupIds": []
+      },
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "S"
+      },
+      "end": {
+        "id": "N"
+      }
+    },
+    {
+      "id": "S_E",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 590.925,
+      "y": 246.402,
+      "strokeWidth": 2,
+      "strokeStyle": "dashed",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          134.20000000000005,
+          109.09800000000001
+        ],
+        [
+          269.24700000000007,
+          109.09800000000001
+        ]
+      ],
+      "label": {
+        "text": "serious crime: redirect only",
+        "fontSize": 20,
+        "groupIds": []
+      },
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "S"
+      },
+      "end": {
+        "id": "E"
+      }
+    },
+    {
+      "id": "S_T",
+      "type": "arrow",
+      "groupIds": [],
+      "x": 582.101,
+      "y": 254.49,
+      "strokeWidth": 2,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          143.024,
+          211.01
+        ],
+        [
+          287.36800000000005,
+          211.01
+        ]
+      ],
+      "label": {
+        "text": "map tiles",
+        "fontSize": 20,
+        "groupIds": []
+      },
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "id": "S"
+      },
+      "end": {
+        "id": "T"
+      }
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {}
+}

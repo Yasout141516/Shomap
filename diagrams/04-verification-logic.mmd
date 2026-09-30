@@ -1,0 +1,11 @@
+graph TD
+  I["New incident: unverified"] --> VOTE["Another user votes<br/>confirm or dispute"]
+  VOTE --> G{"Voter is reporter<br/>or already voted?"}
+  G -->|"yes"| BL["Blocked, reason shown"]
+  G -->|"no"| CT["Update counts"]
+  CT --> C1{"confirms >= 3 AND<br/>confirms >= 2x disputes?"}
+  C1 -->|"yes"| VER["verified: badge + referral"]
+  C1 -->|"no"| C2{"disputes >= 3 AND<br/>disputes > confirms?"}
+  C2 -->|"yes"| DIS["disputed: admin queue,<br/>greyed pin"]
+  C2 -->|"no"| WAIT["stays unverified"]
+  ADM["Admin or authority"] -->|"manual verify / reject"| VER

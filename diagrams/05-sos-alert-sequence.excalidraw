@@ -1,0 +1,640 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "gstack-lite/diagram",
+  "elements": [
+    {
+      "id": "P-top",
+      "type": "rectangle",
+      "x": 0,
+      "y": 0,
+      "width": 153,
+      "height": 65,
+      "label": {
+        "text": "Parent (reporter)",
+        "fontSize": 16,
+        "verticalAlign": "middle",
+        "strokeColor": "#000"
+      },
+      "strokeColor": "#666",
+      "backgroundColor": "#eaeaea",
+      "fillStyle": "solid"
+    },
+    {
+      "id": "P-bottom",
+      "type": "rectangle",
+      "x": 0,
+      "y": 655,
+      "width": 153,
+      "height": 65,
+      "label": {
+        "text": "Parent (reporter)",
+        "fontSize": 16,
+        "verticalAlign": "middle",
+        "strokeColor": "#000"
+      },
+      "strokeColor": "#666",
+      "backgroundColor": "#eaeaea",
+      "fillStyle": "solid"
+    },
+    {
+      "id": "S-top",
+      "type": "rectangle",
+      "x": 456.5,
+      "y": 0,
+      "width": 150,
+      "height": 65,
+      "label": {
+        "text": "ShoMap",
+        "fontSize": 16,
+        "verticalAlign": "middle",
+        "strokeColor": "#000"
+      },
+      "strokeColor": "#666",
+      "backgroundColor": "#eaeaea",
+      "fillStyle": "solid"
+    },
+    {
+      "id": "S-bottom",
+      "type": "rectangle",
+      "x": 456.5,
+      "y": 655,
+      "width": 150,
+      "height": 65,
+      "label": {
+        "text": "ShoMap",
+        "fontSize": 16,
+        "verticalAlign": "middle",
+        "strokeColor": "#000"
+      },
+      "strokeColor": "#666",
+      "backgroundColor": "#eaeaea",
+      "fillStyle": "solid"
+    },
+    {
+      "id": "N-top",
+      "type": "rectangle",
+      "x": 838.5,
+      "y": 0,
+      "width": 150,
+      "height": 65,
+      "label": {
+        "text": "Nearby users",
+        "fontSize": 16,
+        "verticalAlign": "middle",
+        "strokeColor": "#000"
+      },
+      "strokeColor": "#666",
+      "backgroundColor": "#eaeaea",
+      "fillStyle": "solid"
+    },
+    {
+      "id": "N-bottom",
+      "type": "rectangle",
+      "x": 838.5,
+      "y": 655,
+      "width": 150,
+      "height": 65,
+      "label": {
+        "text": "Nearby users",
+        "fontSize": 16,
+        "verticalAlign": "middle",
+        "strokeColor": "#000"
+      },
+      "strokeColor": "#666",
+      "backgroundColor": "#eaeaea",
+      "fillStyle": "solid"
+    },
+    {
+      "id": "A-top",
+      "type": "rectangle",
+      "x": 1038.5,
+      "y": 0,
+      "width": 150,
+      "height": 65,
+      "label": {
+        "text": "Police thana",
+        "fontSize": 16,
+        "verticalAlign": "middle",
+        "strokeColor": "#000"
+      },
+      "strokeColor": "#666",
+      "backgroundColor": "#eaeaea",
+      "fillStyle": "solid"
+    },
+    {
+      "id": "A-bottom",
+      "type": "rectangle",
+      "x": 1038.5,
+      "y": 655,
+      "width": 150,
+      "height": 65,
+      "label": {
+        "text": "Police thana",
+        "fontSize": 16,
+        "verticalAlign": "middle",
+        "strokeColor": "#000"
+      },
+      "strokeColor": "#666",
+      "backgroundColor": "#eaeaea",
+      "fillStyle": "solid"
+    },
+    {
+      "id": "M-top",
+      "type": "rectangle",
+      "x": 1238.5,
+      "y": 0,
+      "width": 150,
+      "height": 65,
+      "label": {
+        "text": "Admin",
+        "fontSize": 16,
+        "verticalAlign": "middle",
+        "strokeColor": "#000"
+      },
+      "strokeColor": "#666",
+      "backgroundColor": "#eaeaea",
+      "fillStyle": "solid"
+    },
+    {
+      "id": "M-bottom",
+      "type": "rectangle",
+      "x": 1238.5,
+      "y": 655,
+      "width": 150,
+      "height": 65,
+      "label": {
+        "text": "Admin",
+        "fontSize": 16,
+        "verticalAlign": "middle",
+        "strokeColor": "#000"
+      },
+      "strokeColor": "#666",
+      "backgroundColor": "#eaeaea",
+      "fillStyle": "solid"
+    },
+    {
+      "type": "line",
+      "x": 76.5,
+      "y": 65,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          590
+        ]
+      ],
+      "width": 0,
+      "height": 590,
+      "strokeStyle": "solid",
+      "strokeColor": "#999",
+      "strokeWidth": 1
+    },
+    {
+      "type": "line",
+      "x": 531.5,
+      "y": 65,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          590
+        ]
+      ],
+      "width": 0,
+      "height": 590,
+      "strokeStyle": "solid",
+      "strokeColor": "#999",
+      "strokeWidth": 1
+    },
+    {
+      "type": "line",
+      "x": 913.5,
+      "y": 65,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          590
+        ]
+      ],
+      "width": 0,
+      "height": 590,
+      "strokeStyle": "solid",
+      "strokeColor": "#999",
+      "strokeWidth": 1
+    },
+    {
+      "type": "line",
+      "x": 1113.5,
+      "y": 65,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          590
+        ]
+      ],
+      "width": 0,
+      "height": 590,
+      "strokeStyle": "solid",
+      "strokeColor": "#999",
+      "strokeWidth": 1
+    },
+    {
+      "type": "line",
+      "x": 1313.5,
+      "y": 65,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          590
+        ]
+      ],
+      "width": 0,
+      "height": 590,
+      "strokeStyle": "solid",
+      "strokeColor": "#999",
+      "strokeWidth": 1
+    },
+    {
+      "type": "arrow",
+      "x": 77.5,
+      "y": 109,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          450,
+          0
+        ]
+      ],
+      "width": 450,
+      "height": 0,
+      "strokeStyle": "solid",
+      "endArrowhead": "arrow",
+      "startArrowhead": null,
+      "label": {
+        "text": "Report missing child (photo, last seen, clothing)",
+        "fontSize": 16
+      },
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "type": "rectangle",
+        "id": "P-top"
+      },
+      "end": {
+        "type": "rectangle",
+        "id": "S-top"
+      }
+    },
+    {
+      "type": "arrow",
+      "x": 532.5,
+      "y": 163,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          60,
+          -10
+        ],
+        [
+          60,
+          30
+        ],
+        [
+          0,
+          20
+        ]
+      ],
+      "width": -532.5,
+      "height": -153,
+      "strokeStyle": "solid",
+      "endArrowhead": "arrow",
+      "startArrowhead": null,
+      "label": {
+        "text": "Urgency = Critical, create SOS alert (3 km, 72h)",
+        "fontSize": 16
+      },
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "type": "rectangle",
+        "id": "S-top"
+      },
+      "end": {
+        "type": "rectangle",
+        "id": "S-top"
+      }
+    },
+    {
+      "type": "arrow",
+      "x": 532.5,
+      "y": 247,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          377,
+          0
+        ]
+      ],
+      "width": 377,
+      "height": 0,
+      "strokeStyle": "solid",
+      "endArrowhead": "arrow",
+      "startArrowhead": null,
+      "label": {
+        "text": "Real-time SOS banner + notification",
+        "fontSize": 16
+      },
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "type": "rectangle",
+        "id": "S-top"
+      },
+      "end": {
+        "type": "rectangle",
+        "id": "N-top"
+      }
+    },
+    {
+      "type": "arrow",
+      "x": 532.5,
+      "y": 301,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          577,
+          0
+        ]
+      ],
+      "width": 577,
+      "height": 0,
+      "strokeStyle": "solid",
+      "endArrowhead": "arrow",
+      "startArrowhead": null,
+      "label": {
+        "text": "Immediate referral (critical)",
+        "fontSize": 16
+      },
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "type": "rectangle",
+        "id": "S-top"
+      },
+      "end": {
+        "type": "rectangle",
+        "id": "A-top"
+      }
+    },
+    {
+      "type": "arrow",
+      "x": 532.5,
+      "y": 355,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          777,
+          0
+        ]
+      ],
+      "width": 777,
+      "height": 0,
+      "strokeStyle": "solid",
+      "endArrowhead": "arrow",
+      "startArrowhead": null,
+      "label": {
+        "text": "Flag for review (fake-alert guard)",
+        "fontSize": 16
+      },
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "type": "rectangle",
+        "id": "S-top"
+      },
+      "end": {
+        "type": "rectangle",
+        "id": "M-top"
+      }
+    },
+    {
+      "type": "arrow",
+      "x": 912.5,
+      "y": 409,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -377,
+          0
+        ]
+      ],
+      "width": -377,
+      "height": 0,
+      "strokeStyle": "solid",
+      "endArrowhead": "arrow",
+      "startArrowhead": null,
+      "label": {
+        "text": "Sighting comment with location",
+        "fontSize": 16
+      },
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "type": "rectangle",
+        "id": "N-top"
+      },
+      "end": {
+        "type": "rectangle",
+        "id": "S-top"
+      }
+    },
+    {
+      "type": "arrow",
+      "x": 530.5,
+      "y": 463,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -450,
+          0
+        ]
+      ],
+      "width": -450,
+      "height": 0,
+      "strokeStyle": "solid",
+      "endArrowhead": "arrow",
+      "startArrowhead": null,
+      "label": {
+        "text": "Notify sighting",
+        "fontSize": 16
+      },
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "type": "rectangle",
+        "id": "S-top"
+      },
+      "end": {
+        "type": "rectangle",
+        "id": "P-top"
+      }
+    },
+    {
+      "type": "arrow",
+      "x": 1112.5,
+      "y": 517,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -577,
+          0
+        ]
+      ],
+      "width": -577,
+      "height": 0,
+      "strokeStyle": "solid",
+      "endArrowhead": "arrow",
+      "startArrowhead": null,
+      "label": {
+        "text": "Acknowledge, in progress",
+        "fontSize": 16
+      },
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "type": "rectangle",
+        "id": "A-top"
+      },
+      "end": {
+        "type": "rectangle",
+        "id": "S-top"
+      }
+    },
+    {
+      "type": "arrow",
+      "x": 77.5,
+      "y": 571,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          450,
+          0
+        ]
+      ],
+      "width": 450,
+      "height": 0,
+      "strokeStyle": "solid",
+      "endArrowhead": "arrow",
+      "startArrowhead": null,
+      "label": {
+        "text": "Mark FOUND",
+        "fontSize": 16
+      },
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "type": "rectangle",
+        "id": "P-top"
+      },
+      "end": {
+        "type": "rectangle",
+        "id": "S-top"
+      }
+    },
+    {
+      "type": "arrow",
+      "x": 532.5,
+      "y": 625,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          377,
+          0
+        ]
+      ],
+      "width": 377,
+      "height": 0,
+      "strokeStyle": "solid",
+      "endArrowhead": "arrow",
+      "startArrowhead": null,
+      "label": {
+        "text": "Alert closed, photo hidden from public",
+        "fontSize": 16
+      },
+      "roundness": {
+        "type": 2
+      },
+      "start": {
+        "type": "rectangle",
+        "id": "S-top"
+      },
+      "end": {
+        "type": "rectangle",
+        "id": "N-top"
+      }
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {}
+}
