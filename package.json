@@ -1,0 +1,30 @@
+{
+  "name": "shomap",
+  "private": true,
+  "version": "0.1.0",
+  "description": "ShoMap hackathon demo: Report. Receive. Respond.",
+  "type": "module",
+  "workspaces": [
+    "packages/shared",
+    "apps/server",
+    "apps/web"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "concurrently -k -n server,web -c green,blue \"npm run dev -w @shomap/server\" \"npm run dev -w @shomap/web\"",
+    "build": "npm run build -w @shomap/web",
+    "demo": "npm run build && npm run start -w @shomap/server",
+    "test": "npm run test -w @shomap/server",
+    "typecheck": "npm run typecheck -w @shomap/shared && npm run typecheck -w @shomap/server && npm run typecheck -w @shomap/web",
+    "e2e": "playwright test",
+    "rehearse": "npm run build && playwright test",
+    "fetch:map": "node scripts/fetch-map.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0",
+    "concurrently": "^9.0.1",
+    "typescript": "^5.6.3"
+  }
+}
