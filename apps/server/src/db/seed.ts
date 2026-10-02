@@ -14,6 +14,8 @@ import {
   type AreaId,
 } from "./seedData.js";
 import { routeReferral } from "../domain/referral.js";
+import { OFFICIAL_DEFAULT } from "../services/actions.js";
+import { config } from "../config.js";
 
 /** Small deterministic PRNG (mulberry32) so every reset produces the same demo. */
 function rng(seed: number) {
@@ -28,6 +30,8 @@ function rng(seed: number) {
 }
 
 const URG = ["low", "medium", "high", "critical"] as const;
+/** The /demo panel fast-forwards 72 h at a time. */
+const FF_HOURS = 72;
 
 /** Tables in child-first order, for deletes. */
 const TABLES = [
@@ -50,11 +54,14 @@ const TABLES = [
   s.appState,
 ];
 
-export function clearAll(db: DB) {
-  for (const t of TABLES) db.delete(t).run();
-}
-
 export const staffIdFor = (authorityId: string) => `u-staff-${authorityId}`;
+
+/** People with a part in the PRD §11 demo script, for the /demo panel and login quick picks. */
+export const DEMO_HEROES: Record<string, string> = {
+  ...Object.fromEntries(CITIZENS.filter((c) => c.hero).map((c) => [c.id, c.hero!])),
+  [staffIdFor("thana-tejgaon")]: "Authority that responds",
+  [ADMIN.id]: "Sees anonymous reporters",
+};
 export const categoryIdFor = (key: string) => `cat-${key}`;
 
 export interface SeedSummary {
@@ -160,8 +167,7 @@ export function seed(db: DB, nowMs: number): SeedSummary {
         const area = areaById.get(areaId)!;
         const locals = CITIZENS.filter((c) => c.home === areaId).map((c) => c.id);
         const reporterId = locals.length && R() < 0.7 ? pick(locals) : pick(citizenIds);
-        const hoursAgo = 0.5 + R() * (14 * 24 - 1);
-        const createdMs = nowMs - hoursAgo * HOUR;
+        let hoursAgo = 0.5 + R() * (14 * 24 - 1);
         const lat = area.lat + (R() - 0.5) * 0.009;
         const lng = area.lng + (R() - 0.5) * 0.009;
         const baseU = URG.indexOf(cat.defaultUrgency);
@@ -179,8 +185,7 @@ export function seed(db: DB, nowMs: number): SeedSummary {
           verification = "disputed";
           confirms = Math.floor(R() * 2);
           disputes = 3 + Math.floor(R() * 2);
-        } else if (roll < 0.7 || hoursAgo > 6 * 24) {
-          // Older reports are verified, so the 7-day unverified sweeper doesn't remove seed data.
+        } else if (roll < 0.7) {
           verification = "verified";
           confirms = 3 + Math.floor(R() * 6);
           disputes = R() < 0.3 ? 1 : 0;
@@ -189,6 +194,10 @@ export function seed(db: DB, nowMs: number): SeedSummary {
           confirms = Math.floor(R() * 3);
           disputes = R() < 0.2 ? 1 : 0;
         }
+        // Unverified reports stay young enough that the unverified-expiry sweep can't reach them,
+        // even after a demo fast-forward (FF_HOURS).
+        if (verification === "unverified") hoursAgo = Math.min(hoursAgo, config.unverifiedExpiryDays * 24 - FF_HOURS - 12);
+        const createdMs = nowMs - hoursAgo * HOUR;
 
         const authorityId =
           verification === "verified" ? routeReferral(cat.authorityType, areaId, jur, auths) : null;
@@ -225,8 +234,8 @@ export function seed(db: DB, nowMs: number): SeedSummary {
             confirmCount: confirms,
             disputeCount: disputes,
             stillCount: 0,
-            reviewReason: null,
-            reviewNote: null,
+            redirected: false,
+            redirectNote: null,
             idempotencyKey: null,
             occurredAt: iso(createdMs - R() * HOUR),
             createdAt: iso(createdMs),
@@ -257,27 +266,32 @@ export function seed(db: DB, nowMs: number): SeedSummary {
         }
 
         // Status history + referral + official comments.
-        const events = chain.map((to, i) => ({
-          id: `${id}-e${i}`,
-          incidentId: id,
-          actorId: i === 0 ? reporterId : to === "referred" || to === "closed" ? null : staffIdFor(authorityId!),
-          actorRole: i === 0 ? "citizen" : to === "referred" || to === "closed" ? "system" : "authority",
-          fromStatus: i === 0 ? null : chain[i - 1],
-          toStatus: to,
-          note:
-            to === "referred"
-              ? "Verified by neighbours. Referred automatically."
-              : to === "acknowledged"
-                ? OFFICIAL_NOTES.acknowledge
-                : to === "in_progress"
-                  ? OFFICIAL_NOTES.start
-                  : to === "resolved"
-                    ? pick(OFFICIAL_NOTES.resolve)
-                    : to === "closed"
-                      ? "Closed after 72 hours with no objection."
-                      : null,
-          createdAt: at(i),
-        }));
+        // Same notes as the live code writes: system notes as i18n keys, official updates as text.
+        const systemNote: Partial<Record<St, { key: string; params?: Record<string, number> }>> = {
+          referred: { key: "referredAuto" },
+          closed: { key: "autoClosed", params: { hours: config.autoCloseHours } },
+        };
+        const officialText: Partial<Record<St, string>> = {
+          acknowledged: OFFICIAL_DEFAULT.acknowledge,
+          in_progress: OFFICIAL_DEFAULT.start,
+          resolved: pick(OFFICIAL_NOTES.resolve),
+        };
+        const events = chain.map((to, i) => {
+          const system = i > 0 && (to === "referred" || to === "closed");
+          return {
+            id: `${id}-e${i}`,
+            incidentId: id,
+            actorId: i === 0 ? reporterId : system ? null : staffIdFor(authorityId!),
+            actorRole: i === 0 ? "citizen" : system ? "system" : "authority",
+            kind: "status" as const,
+            fromStatus: i === 0 ? null : chain[i - 1],
+            toStatus: to,
+            note: officialText[to] ?? null,
+            noteKey: systemNote[to]?.key ?? null,
+            noteParams: JSON.stringify(systemNote[to]?.params ?? {}),
+            createdAt: at(i),
+          };
+        });
         tx.insert(s.statusEvents).values(events).run();
 
         if (authorityId) {

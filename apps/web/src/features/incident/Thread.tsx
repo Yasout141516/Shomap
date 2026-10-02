@@ -1,34 +1,30 @@
 import { useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
 import maplibregl, { type Map as MlMap } from "maplibre-gl";
 import { MapPin, Reply, ShieldCheck } from "lucide-react";
-import type { CommentDTO, IncidentDetailDTO } from "@shomap/shared";
+import type { CommentDTO, CommentInput, IncidentDetailDTO } from "@shomap/shared";
 import { useI18n } from "../../i18n";
-import { api, errorText } from "../../lib/api";
-import { useApp } from "../../lib/appState";
-import { relTime } from "../../lib/format";
-import { qk, useComments, useMeta } from "../../lib/queries";
+import { api } from "../../lib/api";
+import { useAction } from "../../lib/actions";
+import { identityLabel, relTime } from "../../lib/format";
+import { useLookup } from "../../lib/lookup";
+import { qk, useComments } from "../../lib/queries";
 import { useSession } from "../../lib/session";
 import { EmptyState, ErrorState, Skeleton } from "../../ui/states";
 import { BaseMap } from "../map/BaseMap";
 
-type Kind = "comment" | "update" | "offer_help" | "sighting";
+type Kind = CommentInput["kind"];
 
 function CommentItem({ c, onReply }: { c: CommentDTO; onReply?: () => void }) {
   const { t, name, lang } = useI18n();
-  const meta = useMeta();
-  const authority = c.authorityId ? meta.data?.authorities.find((a) => a.id === c.authorityId) : undefined;
+  const lookup = useLookup();
+  const authority = lookup.authority(c.authorityId);
   const who =
     c.kind === "official"
       ? authority
         ? name(authority)
         : t("common.moderators")
-      : c.authorIsYou
-        ? c.isAnonymous
-          ? t("common.youHidden")
-          : t("common.you")
-        : c.author?.displayName ?? t("common.anonymous");
+      : identityLabel({ isYou: c.authorIsYou, isAnonymous: c.isAnonymous, name: c.author?.displayName ?? null }, t);
   return (
     <div className={`comment kind-${c.kind}`}>
       <p className="comment-head">
@@ -74,8 +70,7 @@ function SightingPicker({ center, value, onChange }: { center: { lat: number; ln
 export function Thread({ incident }: { incident: IncidentDetailDTO }) {
   const { t } = useI18n();
   const { me } = useSession();
-  const { toast } = useApp();
-  const qc = useQueryClient();
+  const { run, busy } = useAction();
   const comments = useComments(incident.id);
   const isSos = !!incident.sos;
   const sosActive = incident.sos?.state === "active";
@@ -85,7 +80,6 @@ export function Thread({ incident }: { incident: IncidentDetailDTO }) {
   const [replyTo, setReplyTo] = useState<CommentDTO | null>(null);
   const [pin, setPin] = useState<{ lat: number; lng: number } | null>(null);
   const [showPin, setShowPin] = useState(false);
-  const [busy, setBusy] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const { roots, replies } = useMemo(() => {
@@ -100,22 +94,18 @@ export function Thread({ incident }: { incident: IncidentDetailDTO }) {
 
   const submit = async () => {
     if (!body.trim()) return;
-    setBusy(true);
-    try {
-      await api(`/api/incidents/${incident.id}/comments`, {
-        body: { body, kind: isCitizen ? kind : "comment", parentId: replyTo?.id, isAnonymous: isCitizen && anon && kind !== "sighting", ...(pin && kind === "sighting" ? pin : {}) },
-      });
-      setBody("");
-      setReplyTo(null);
-      setPin(null);
-      setShowPin(false);
-      if (kind === "sighting") toast(t("sos.sightingSent"), "success");
-      void qc.invalidateQueries({ queryKey: qk.comments(incident.id) });
-    } catch (e) {
-      toast(errorText(e, t), "error");
-    } finally {
-      setBusy(false);
-    }
+    const ok = await run(
+      () =>
+        api(`/api/incidents/${incident.id}/comments`, {
+          body: { body, kind: isCitizen ? kind : "comment", parentId: replyTo?.id, isAnonymous: isCitizen && anon && kind !== "sighting", ...(pin && kind === "sighting" ? pin : {}) },
+        }),
+      { success: kind === "sighting" ? t("sos.sightingSent") : undefined, invalidate: [qk.comments(incident.id)] },
+    );
+    if (ok === undefined) return;
+    setBody("");
+    setReplyTo(null);
+    setPin(null);
+    setShowPin(false);
   };
 
   const kinds: Kind[] = isSos ? ["sighting", "comment", "offer_help"] : ["comment", "update", "offer_help"];

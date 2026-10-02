@@ -186,9 +186,8 @@ export const CITIZEN_COMMENTS = [
   { kind: "offer_help", body: "If anyone needs to walk to the bus stand at night, our group walks together at 9pm." },
 ] as const;
 
+/** Resolution notes for seeded incidents (acknowledge/start use the live defaults). */
 export const OFFICIAL_NOTES = {
-  acknowledge: "Received. Assigning an officer to the location.",
-  start: "Team is on site and looking into it.",
   resolve: [
     "Patrol increased at this spot from 6pm to 11pm. Two suspects detained.",
     "Cleared and cleaned. Collection schedule fixed for this lane.",

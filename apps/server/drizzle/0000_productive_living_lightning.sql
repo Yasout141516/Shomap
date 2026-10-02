@@ -11,6 +11,7 @@ CREATE TABLE `abuse_flags` (
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `abuse_flags_target_user` ON `abuse_flags` (`target_type`,`target_id`,`flagged_by`);--> statement-breakpoint
+CREATE INDEX `abuse_flags_incident_idx` ON `abuse_flags` (`incident_id`);--> statement-breakpoint
 CREATE TABLE `app_state` (
 	`key` text PRIMARY KEY NOT NULL,
 	`value` text NOT NULL
@@ -76,6 +77,7 @@ CREATE TABLE `incident_media` (
 	FOREIGN KEY (`incident_id`) REFERENCES `incidents`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
+CREATE INDEX `incident_media_incident_idx` ON `incident_media` (`incident_id`);--> statement-breakpoint
 CREATE TABLE `incidents` (
 	`id` text PRIMARY KEY NOT NULL,
 	`reporter_id` text NOT NULL,
@@ -92,8 +94,8 @@ CREATE TABLE `incidents` (
 	`confirm_count` integer DEFAULT 0 NOT NULL,
 	`dispute_count` integer DEFAULT 0 NOT NULL,
 	`still_count` integer DEFAULT 0 NOT NULL,
-	`review_reason` text,
-	`review_note` text,
+	`redirected` integer DEFAULT false NOT NULL,
+	`redirect_note` text,
 	`idempotency_key` text,
 	`occurred_at` text NOT NULL,
 	`created_at` text NOT NULL,
@@ -157,6 +159,7 @@ CREATE TABLE `sos_alerts` (
 	`issued_at` text NOT NULL,
 	`expires_at` text NOT NULL,
 	`closed_at` text,
+	`reviewed_at` text,
 	FOREIGN KEY (`incident_id`) REFERENCES `incidents`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
@@ -166,9 +169,12 @@ CREATE TABLE `status_events` (
 	`incident_id` text NOT NULL,
 	`actor_id` text,
 	`actor_role` text NOT NULL,
+	`kind` text DEFAULT 'status' NOT NULL,
 	`from_status` text,
 	`to_status` text NOT NULL,
 	`note` text,
+	`note_key` text,
+	`note_params` text DEFAULT '{}' NOT NULL,
 	`created_at` text NOT NULL,
 	FOREIGN KEY (`incident_id`) REFERENCES `incidents`(`id`) ON UPDATE no action ON DELETE no action
 );
@@ -220,3 +226,5 @@ CREATE TABLE `watch_zones` (
 	`created_at` text NOT NULL,
 	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
 );
+--> statement-breakpoint
+CREATE INDEX `watch_zones_user_idx` ON `watch_zones` (`user_id`);

@@ -1,5 +1,5 @@
 import type { IncidentDTO, Status, Urgency } from "@shomap/shared";
-import { CircleCheck, EyeOff, ShieldCheck, TriangleAlert } from "lucide-react";
+import { CircleCheck, EyeOff, TriangleAlert } from "lucide-react";
 import { useI18n } from "../i18n";
 import { shapeSvg } from "./pin";
 
@@ -35,15 +35,6 @@ export function VerificationBadge({ incident }: { incident: Pick<IncidentDTO, "v
 export function StatusPill({ status }: { status: Status }) {
   const { t } = useI18n();
   return <span className={`badge badge-status s-${status}`}>{t(`status.${status}`)}</span>;
-}
-
-export function OfficialBadge({ label }: { label: string }) {
-  return (
-    <span className="badge badge-official">
-      <ShieldCheck size={13} aria-hidden="true" />
-      {label}
-    </span>
-  );
 }
 
 export function AnonymousBadge({ label }: { label: string }) {

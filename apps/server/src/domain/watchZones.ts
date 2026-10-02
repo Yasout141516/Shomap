@@ -1,5 +1,4 @@
-import { URGENCY_ORDER, type Urgency } from "@shomap/shared";
-import { haversineM, type LatLng } from "./geo.js";
+import { URGENCY_ORDER, haversineM, type LatLng, type Urgency } from "@shomap/shared";
 
 export interface ZoneRow extends LatLng {
   id: string;

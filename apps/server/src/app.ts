@@ -46,10 +46,14 @@ export async function buildApp(opts: BuildOptions): Promise<{ app: FastifyInstan
     await app.register(fastifyStatic, { root: cfg.offlineDir, prefix: "/offline/", decorateReply: false });
   }
   const hasWeb = fs.existsSync(path.join(cfg.webDist, "index.html"));
-  if (hasWeb) await app.register(fastifyStatic, { root: cfg.webDist, prefix: "/", wildcard: false });
-  // Single-page app: unknown non-API GETs get index.html; everything else is a JSON 404.
+  // Files are looked up per request (wildcard), so a rebuild while the server runs is picked up.
+  if (hasWeb) await app.register(fastifyStatic, { root: cfg.webDist, prefix: "/" });
+  // Single-page app: unknown *page* URLs get index.html. A missing asset (anything with a file
+  // extension) must stay a 404, or the browser gets HTML where it expected JS and shows a blank page.
   app.setNotFoundHandler((req, reply) => {
-    if (hasWeb && req.method === "GET" && !req.url.startsWith("/api/") && !req.url.startsWith("/socket.io")) {
+    const pathname = req.url.split("?")[0];
+    const isPage = !pathname.startsWith("/api/") && !pathname.startsWith("/socket.io") && !/\.[a-z0-9]+$/i.test(pathname);
+    if (hasWeb && req.method === "GET" && isPage) {
       return reply.type("text/html").sendFile("index.html");
     }
     return reply.status(404).send(apiError("not_found"));

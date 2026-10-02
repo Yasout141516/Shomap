@@ -1,11 +1,12 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import type { IncidentDetailDTO } from "@shomap/shared";
+import type { IncidentDTO, IncidentDetailDTO } from "@shomap/shared";
 import { useI18n } from "../../i18n";
-import { api, errorText } from "../../lib/api";
-import { useApp } from "../../lib/appState";
+import { api } from "../../lib/api";
+import { useAction } from "../../lib/actions";
+import { useToast } from "../../lib/appState";
 import { qk, useMeta } from "../../lib/queries";
+import { upsertIncident } from "../../lib/realtime";
 import { useSession } from "../../lib/session";
 
 /** PRD §12.4 "Seen this too?" — one tap each; disabled states always explain themselves. */
@@ -13,36 +14,37 @@ export function VoteBox({ incident }: { incident: IncidentDetailDTO }) {
   const { t } = useI18n();
   const { me } = useSession();
   const meta = useMeta();
-  const { toast } = useApp();
   const qc = useQueryClient();
-  const [busy, setBusy] = useState(false);
-  const needed = meta.data?.config.confirmThreshold ?? 3;
-  const refresh = () => {
-    void qc.invalidateQueries({ queryKey: qk.incident(incident.id) });
-    void qc.invalidateQueries({ queryKey: qk.incidents });
-  };
+  const { run, busy } = useAction();
+  const { toast } = useToast();
 
-  const run = async (fn: () => Promise<unknown>, ok?: string) => {
-    setBusy(true);
-    try {
-      await fn();
-      if (ok) toast(ok, "success");
-      refresh();
-    } catch (e) {
-      toast(errorText(e, t), "error");
-      refresh();
-    } finally {
-      setBusy(false);
-    }
-  };
-  const vote = (v: "confirm" | "dispute") => run(() => api(`/api/incidents/${incident.id}/votes`, { body: { vote: v } }));
+  /** POSTs return the updated incident: put it in the list now; the detail (with timeline) refetches. */
+  const act = (path: string, body?: unknown, success?: string) =>
+    run(
+      async () => {
+        const r = await api<{ incident: IncidentDTO | null; neighbour?: string }>(path, body ? { body } : { method: "POST" });
+        if (r.incident) upsertIncident(qc, r.incident);
+        return r;
+      },
+      { success, invalidate: [qk.incident(incident.id)] },
+    );
 
-  const resolved = incident.status === "resolved";
-  const counts = (
-    <p className="muted small">
-      {t("incident.confirms", { count: incident.confirmCount })} · {t("incident.disputes", { count: incident.disputeCount })}
-    </p>
-  );
+  if (incident.status === "closed" || (incident.sos && incident.status !== "resolved")) return null;
+
+  if (incident.status === "resolved") {
+    const needed = meta.data?.config.reopenThreshold ?? 3;
+    return (
+      <section className="vote-box" aria-label={t("incident.stillHappening")}>
+        <p className="vote-q">{t("incident.stillHappening")}?</p>
+        <p className="muted small">{t("incident.stillHappeningHelp", { count: incident.stillHappeningCount, needed })}</p>
+        {me?.role === "citizen" ? (
+          <button className="btn btn-secondary" disabled={busy || incident.myStillHappening} onClick={() => void act(`/api/incidents/${incident.id}/still-happening`, undefined, t("incident.stillSent"))}>
+            {incident.myStillHappening ? t("incident.stillSent") : t("incident.stillHappening")}
+          </button>
+        ) : null}
+      </section>
+    );
+  }
 
   let body;
   if (!me) {
@@ -60,10 +62,10 @@ export function VoteBox({ incident }: { incident: IncidentDetailDTO }) {
   } else {
     body = (
       <div className="vote-buttons">
-        <button className="btn btn-primary" disabled={busy} onClick={() => void vote("confirm")}>
+        <button className="btn btn-primary" disabled={busy} onClick={() => void act(`/api/incidents/${incident.id}/votes`, { vote: "confirm" })}>
           {t("incident.confirm")}
         </button>
-        <button className="btn btn-secondary" disabled={busy} onClick={() => void vote("dispute")}>
+        <button className="btn btn-secondary" disabled={busy} onClick={() => void act(`/api/incidents/${incident.id}/votes`, { vote: "dispute" })}>
           {t("incident.dispute")}
         </button>
       </div>
@@ -72,42 +74,28 @@ export function VoteBox({ incident }: { incident: IncidentDetailDTO }) {
 
   return (
     <section className="vote-box" aria-label={t("incident.seenThis")}>
-      {resolved ? (
-        <>
-          <p className="vote-q">{t("incident.stillHappening")}?</p>
-          <p className="muted small">{t("incident.stillHappeningHelp", { count: incident.stillHappeningCount, needed })}</p>
-          {me?.role === "citizen" ? (
-            <button
-              className="btn btn-secondary"
-              disabled={busy || incident.myStillHappening}
-              title={incident.myStillHappening ? t("incident.stillSent") : undefined}
-              onClick={() => void run(() => api(`/api/incidents/${incident.id}/still-happening`, { method: "POST" }), t("incident.stillSent"))}
-            >
-              {incident.myStillHappening ? t("incident.stillSent") : t("incident.stillHappening")}
-            </button>
-          ) : null}
-        </>
-      ) : incident.status === "closed" || incident.sos ? null : (
-        <>
-          <p className="vote-q">{t("incident.seenThis")}</p>
-          {body}
-          {counts}
-          {meta.data?.demoMode && me && incident.verification !== "verified" ? (
-            <button
-              className="link-like small"
-              disabled={busy}
-              onClick={() =>
-                void run(async () => {
-                  const r = await api<{ neighbour: string }>("/api/demo/neighbour-confirm", { body: { incidentId: incident.id } });
-                  toast(t("incident.demoConfirmed", { name: r.neighbour }), "success");
-                })
-              }
-            >
-              {t("incident.demoConfirm")}
-            </button>
-          ) : null}
-        </>
-      )}
+      <p className="vote-q">{t("incident.seenThis")}</p>
+      {body}
+      <p className="muted small">
+        {t("incident.confirms", { count: incident.confirmCount })} · {t("incident.disputes", { count: incident.disputeCount })}
+      </p>
+      {meta.data?.demoMode && me && incident.verification !== "verified" ? (
+        <button
+          className="link-like small"
+          disabled={busy}
+          onClick={() =>
+            void run(
+              async () => {
+                const r = await api<{ neighbour: string }>("/api/demo/neighbour-confirm", { body: { incidentId: incident.id } });
+                toast(t("incident.demoConfirmed", { name: r.neighbour }), "success");
+              },
+              { invalidate: [qk.incident(incident.id)] },
+            )
+          }
+        >
+          {t("incident.demoConfirm")}
+        </button>
+      ) : null}
     </section>
   );
 }

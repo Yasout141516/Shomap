@@ -20,11 +20,10 @@ import * as s from "../db/schema.js";
 import { clearSession, currentUser, requireUser, setSession, toViewer } from "../auth.js";
 import { HttpError, badRequest, notFound } from "../errors.js";
 import type { Ctx } from "../services/context.js";
-import { commentDTOs, getIncidentRow, incidentDTO, statusEvents } from "../services/repo.js";
-import { addComment, createIncident, flag, precheckReport, stillHappening, vote } from "../services/reports.js";
+import { commentDTOs, getIncidentRow, incidentDTO, incidentDTOs, statusEvents } from "../services/repo.js";
+import { addComment, flag, stillHappening, submitReport, vote } from "../services/reports.js";
 import { activeSos, dashboard, listIncidents } from "../services/queries.js";
 import { closeSosByUser } from "../services/actions.js";
-import { deletePhotos, savePhoto } from "../services/uploads.js";
 import { notificationDTO } from "../realtime.js";
 
 export function meDTO(u: s.UserRow): MeDTO {
@@ -63,7 +62,15 @@ export function publicRoutes(app: FastifyInstance, ctx: Ctx) {
       .map(({ sort: _s, ...c }) => c),
     authorities: db.select().from(s.authorities).all(),
     demoMode: ctx.cfg.demoMode,
-    config: { confirmThreshold: ctx.cfg.confirmThreshold, sosRadiusM: ctx.cfg.sosRadiusM, dhakaBounds: ctx.cfg.dhakaBounds },
+    config: {
+      confirmThreshold: ctx.cfg.confirmThreshold,
+      reopenThreshold: ctx.cfg.reopenThreshold,
+      sosRadiusM: ctx.cfg.sosRadiusM,
+      maxPhotos: ctx.cfg.maxPhotos,
+      maxPhotoBytes: ctx.cfg.maxPhotoBytes,
+      maxWatchZones: ctx.cfg.maxWatchZones,
+      dhakaBounds: ctx.cfg.dhakaBounds,
+    },
   }));
 
   // ---- Auth (mock OTP, FR-1.1)
@@ -122,12 +129,11 @@ export function publicRoutes(app: FastifyInstance, ctx: Ctx) {
     const viewer = toViewer(currentUser(req, db));
     const row = getIncidentRow(db, id);
     if (!row || (row.status === "removed" && viewer?.role !== "admin")) throw notFound();
-    return { incident: { ...incidentDTO(db, id, viewer)!, events: statusEvents(db, row, viewer) } };
+    return { incident: { ...incidentDTOs(db, [row], viewer)[0], events: statusEvents(db, row, viewer) } };
   });
 
   app.post("/api/incidents", async (req, reply) => {
     const user = requireUser(req, db);
-    if (user.role !== "citizen") throw new HttpError(403, "forbidden");
     let data: unknown = null;
     const files: Buffer[] = [];
     for await (const part of req.parts()) {
@@ -138,19 +144,9 @@ export function publicRoutes(app: FastifyInstance, ctx: Ctx) {
         data = JSON.parse(String(part.value));
       }
     }
-    const input = ReportInput.parse(data);
-    precheckReport(ctx, user, input, files.length);
-    const urls: string[] = [];
-    try {
-      for (const f of files) urls.push(await savePhoto(uploadsDir, f));
-      const result = await createIncident(ctx, user, input, urls);
-      if (result.duplicate) await deletePhotos(uploadsDir, urls);
-      reply.status(result.duplicate ? 200 : 201);
-      return { ...result, incident: incidentDTO(db, result.id, toViewer(user)) };
-    } catch (err) {
-      await deletePhotos(uploadsDir, urls);
-      throw err;
-    }
+    const result = await submitReport(ctx, user, ReportInput.parse(data), files, uploadsDir);
+    reply.status(result.duplicate ? 200 : 201);
+    return { ...result, incident: incidentDTO(db, result.id, toViewer(user)) };
   });
 
   app.post("/api/incidents/:id/votes", async (req) => {

@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { haversineM, inBounds, nearestArea, circlesOverlap } from "../../src/domain/geo.js";
+import { haversineM, inBounds, nearestArea, circlesOverlap, canTransition, type Actor } from "@shomap/shared";
 import { evaluateVerification } from "../../src/domain/verification.js";
-import { canTransition, type Actor } from "../../src/domain/lifecycle.js";
 import { routeReferral } from "../../src/domain/referral.js";
 import { sosRecipients } from "../../src/domain/sos.js";
 import { zonesMatching } from "../../src/domain/watchZones.js";

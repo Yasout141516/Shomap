@@ -3,8 +3,10 @@ import type {
   CategoryKind,
   CommentKind,
   DashboardScope,
+  EventKind,
   Lang,
   NotificationType,
+  QueueReason,
   Role,
   SosState,
   Status,
@@ -51,7 +53,11 @@ export interface MetaDTO {
   demoMode: boolean;
   config: {
     confirmThreshold: number;
+    reopenThreshold: number;
     sosRadiusM: number;
+    maxPhotos: number;
+    maxPhotoBytes: number;
+    maxWatchZones: number;
     dhakaBounds: [number, number, number, number];
   };
 }
@@ -93,6 +99,8 @@ export interface SosDTO {
   clothing: string;
   lastSeenAt: string;
   pendingReview: boolean;
+  /** This viewer was sent the alert (home area or watch zone inside the radius). */
+  alertedYou: boolean;
 }
 
 export interface MediaDTO {
@@ -131,9 +139,15 @@ export interface IncidentDTO {
 
 export interface StatusEventDTO {
   id: string;
+  kind: EventKind;
   fromStatus: string | null;
+  /** A Status, a Verification, or an SosState, depending on `kind`. */
   toStatus: string;
+  /** Free text written by a person. */
   note: string | null;
+  /** System notes are stored as an i18n key (under `eventNotes.`) so they translate. */
+  noteKey: string | null;
+  noteParams: Record<string, string | number>;
   actorRole: Role | "system";
   actorName: string | null;
   createdAt: string;
@@ -191,7 +205,7 @@ export interface DashboardDTO {
 
 export interface QueueItemDTO {
   incident: IncidentDTO;
-  reason: "sos_review" | "disputed" | "flagged" | "redirected";
+  reason: QueueReason;
   flagCount: number;
   note: string | null;
 }
@@ -199,6 +213,7 @@ export interface QueueItemDTO {
 export interface EventLogDTO {
   id: string;
   incidentId: string;
+  kind: EventKind;
   toStatus: string;
   note: string | null;
   actorName: string | null;
@@ -210,7 +225,8 @@ export interface DemoInfoDTO {
   /** SVG markup of a QR code for the first LAN URL. */
   qrSvg: string | null;
   clockOffsetHours: number;
-  users: { id: string; displayName: string; role: Role; homeAreaId: string | null; authorityId: string | null }[];
+  /** `hero` names the person's part in the PRD §11 demo script, if any. */
+  users: { id: string; displayName: string; role: Role; homeAreaId: string | null; authorityId: string | null; hero: string | null }[];
 }
 
 /** Socket events: server → client payloads. */
@@ -218,8 +234,6 @@ export interface ServerEvents {
   "incident:created": (incident: IncidentDTO) => void;
   "incident:updated": (incident: IncidentDTO) => void;
   "comment:created": (comment: CommentDTO) => void;
-  "sos:issued": (payload: { incident: IncidentDTO }) => void;
-  "sos:closed": (payload: { incidentId: string; sosId: string; state: SosState }) => void;
   "notification:new": (n: NotificationDTO) => void;
   "demo:reset": () => void;
 }

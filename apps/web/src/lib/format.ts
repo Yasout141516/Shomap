@@ -1,4 +1,4 @@
-import type { Lang } from "@shomap/shared";
+import { DHAKA_OFFSET_MS, type Lang } from "@shomap/shared";
 
 const rtf: Record<Lang, Intl.RelativeTimeFormat> = {
   en: new Intl.RelativeTimeFormat("en", { numeric: "auto" }),
@@ -44,9 +44,15 @@ export function shortDate(isoDate: string, lang: Lang): string {
 
 /** Value for <input type="datetime-local"> in Dhaka time. */
 export function toLocalInput(d: Date): string {
-  const dhaka = new Date(d.getTime() + 6 * 3600_000);
+  const dhaka = new Date(d.getTime() + DHAKA_OFFSET_MS);
   return dhaka.toISOString().slice(0, 16);
 }
 export function fromLocalInput(v: string): string {
-  return new Date(Date.parse(`${v}:00Z`) - 6 * 3600_000).toISOString();
+  return new Date(Date.parse(`${v}:00Z`) - DHAKA_OFFSET_MS).toISOString();
+}
+
+/** "You" / "You · hidden from public" / the name / "Anonymous" for a reporter or commenter. */
+export function identityLabel(p: { isYou: boolean; isAnonymous: boolean; name: string | null }, t: (k: string) => string): string {
+  if (p.isYou) return t(p.isAnonymous ? "common.youHidden" : "common.you");
+  return p.name ?? t("common.anonymous");
 }

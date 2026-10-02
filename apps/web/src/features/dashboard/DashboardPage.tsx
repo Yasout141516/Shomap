@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { URGENCIES, type DashboardDTO, type Urgency } from "@shomap/shared";
+import { URGENCIES, type DashboardDTO, type DashboardScope, type Urgency } from "@shomap/shared";
 import { useI18n } from "../../i18n";
 import { DEFAULT_FILTERS, useApp, type Filters } from "../../lib/appState";
 import { shortDate } from "../../lib/format";
-import { useDashboard, useMeta, useZones } from "../../lib/queries";
-import { useHomeAreaId, useSession } from "../../lib/session";
+import { useLookup } from "../../lib/lookup";
+import { useDashboard, useZones } from "../../lib/queries";
+import { useHomeAreaId } from "../../lib/session";
 import { URGENCY_COLOR, shapeSvg } from "../../ui/pin";
 import { EmptyState, ErrorState, Skeleton } from "../../ui/states";
 
@@ -53,14 +54,14 @@ function Trend({ data }: { data: DashboardDTO["trend"] }) {
 export function DashboardPage() {
   const { t, name, n, lang } = useI18n();
   const nav = useNavigate();
-  const meta = useMeta();
-  const { me } = useSession();
+  const lookup = useLookup();
   const homeAreaId = useHomeAreaId();
-  const zones = useZones(!!me && me.role === "citizen");
+  const zones = useZones();
   const { setFilters } = useApp();
+  // Select value: "home" | "all" | "zone:<id>".
   const [scope, setScope] = useState<string>(homeAreaId ? "home" : "all");
-  const isZone = scope.startsWith("zone:");
-  const q = useDashboard(isZone ? "zone" : scope === "home" ? "home" : "all", isZone ? scope.slice(5) : scope === "home" ? (homeAreaId ?? undefined) : undefined);
+  const [kind, zoneId] = scope.split(":") as [DashboardScope, string | undefined];
+  const q = useDashboard(kind, kind === "zone" ? zoneId : kind === "home" ? homeAreaId ?? undefined : undefined);
   const d = q.data;
 
   /** FR-7.5: numbers open the map pre-filtered. */
@@ -69,8 +70,8 @@ export function DashboardPage() {
     nav("/");
   };
   const scopeName = d ? (d.scope === "all" ? t("dashboard.scopeAll") : d.scopeLabel[lang]) : "";
-  const maxCat = Math.max(1, ...(d?.byCategory.map((c) => c.count) ?? [1]));
-  const maxU = Math.max(1, ...(d ? URGENCIES.map((u) => d.byUrgency[u]) : [1]));
+  const maxCat = Math.max(1, ...(d?.byCategory.map((c) => c.count) ?? []));
+  const maxU = Math.max(1, ...(d ? URGENCIES.map((u) => d.byUrgency[u]) : []));
 
   return (
     <div className="page">
@@ -84,7 +85,7 @@ export function DashboardPage() {
           <select id="dashboard-scope" value={scope} onChange={(e) => setScope(e.target.value)}>
             {homeAreaId ? (
               <option value="home">
-                {t("dashboard.scopeHome")} ({name(meta.data?.areas.find((a) => a.id === homeAreaId))})
+                {t("dashboard.scopeHome")} ({name(lookup.area(homeAreaId))})
               </option>
             ) : null}
             {(zones.data ?? []).map((z) => (
@@ -150,7 +151,7 @@ export function DashboardPage() {
                 {d.byCategory.map((c) => (
                   <li key={c.categoryId}>
                     <button className="bar-row" onClick={() => drill({ categories: [c.categoryId] })}>
-                      <span className="bar-label">{name(meta.data?.categories.find((x) => x.id === c.categoryId))}</span>
+                      <span className="bar-label">{name(lookup.category(c.categoryId))}</span>
                       <span className="bar-track">
                         <span className="bar-fill bar-brand" style={{ width: `${(c.count / maxCat) * 100}%` }} />
                       </span>

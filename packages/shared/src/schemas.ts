@@ -4,7 +4,6 @@ import {
   FLAG_REASONS,
   LANGS,
   REFERRAL_ACTIONS,
-  ROLES,
   URGENCIES,
   WATCH_RADII,
 } from "./enums.js";
@@ -111,5 +110,5 @@ export const FlagInput = z.object({
 });
 export type FlagInput = z.infer<typeof FlagInput>;
 
-export const SwitchRoleInput = z.object({ role: z.enum(ROLES), userId: z.string().optional() });
+export const SwitchRoleInput = z.object({ userId: z.string() });
 export type SwitchRoleInput = z.infer<typeof SwitchRoleInput>;

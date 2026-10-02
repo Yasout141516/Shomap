@@ -3,23 +3,21 @@ import { Link, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import maplibregl, { type Map as MlMap } from "maplibre-gl";
 import { Camera, Crosshair, Phone, Siren, X } from "lucide-react";
-import { URGENCIES, type CategoryDTO, type IncidentDTO, type Urgency } from "@shomap/shared";
+import { ReportInput, SosDetailsInput, allowedUrgencies, type AreaDTO, type CategoryDTO, type IncidentDTO, type Urgency } from "@shomap/shared";
 import { useI18n } from "../../i18n";
 import { ApiFail, api, errorText } from "../../lib/api";
-import { useApp } from "../../lib/appState";
+import { useApp, useToast } from "../../lib/appState";
 import { fromLocalInput, toLocalInput } from "../../lib/format";
 import { inBounds, nearest } from "../../lib/geo";
-import { qk, useMeta } from "../../lib/queries";
-import { useHomeAreaId, useSession } from "../../lib/session";
+import { useMeta } from "../../lib/queries";
+import { upsertIncident } from "../../lib/realtime";
+import { useHomeArea, useSession } from "../../lib/session";
 import { Modal } from "../../ui/Modal";
 import { CategoryIcon } from "../../ui/icons";
 import { shapeSvg } from "../../ui/pin";
 import { StatusTracker } from "../../ui/StatusTracker";
 import { BaseMap } from "../map/BaseMap";
 import { LangToggle } from "../shell/LangToggle";
-
-const MAX_PHOTOS = 3;
-const MAX_BYTES = 5 * 1024 * 1024;
 
 /** crypto.randomUUID needs a secure context, which phones on plain LAN http don't have. */
 function newKey(): string {
@@ -95,9 +93,13 @@ function HotlineCard({ category, onBack }: { category: CategoryDTO; onBack: () =
 function LocationStep({
   point,
   setPoint,
+  outside,
+  area,
 }: {
   point: { lat: number; lng: number };
   setPoint: (p: { lat: number; lng: number }) => void;
+  outside: boolean;
+  area: AreaDTO | undefined;
 }) {
   const { t, name } = useI18n();
   const meta = useMeta();
@@ -106,8 +108,6 @@ function LocationStep({
   const mapRef = useRef<MlMap | null>(null);
   const marker = useRef<maplibregl.Marker | null>(null);
   const bounds = meta.data?.config.dhakaBounds;
-  const outside = bounds ? !inBounds(point, bounds) : false;
-  const area = meta.data ? nearest(point, meta.data.areas) : undefined;
 
   const move = (p: { lat: number; lng: number }, fly = true) => {
     setPoint(p);
@@ -196,18 +196,19 @@ function LocationStep({
 
 export function ReportModal() {
   const { t, name } = useI18n();
-  const { closeReport, toast } = useApp();
+  const { closeReport } = useApp();
+  const { toast } = useToast();
   const meta = useMeta();
   const { me } = useSession();
-  const homeAreaId = useHomeAreaId();
+  const home = useHomeArea();
   const nav = useNavigate();
   const qc = useQueryClient();
 
   const key = useMemo(newKey, []);
-  const home = meta.data?.areas.find((a) => a.id === homeAreaId) ?? meta.data?.areas.find((a) => a.id === "farmgate");
   const [step, setStep] = useState<1 | 2 | 3 | "done">(1);
   const [category, setCategory] = useState<CategoryDTO | null>(null);
-  const [point, setPoint] = useState(home ? { lat: home.lat, lng: home.lng } : { lat: 23.7575, lng: 90.3897 });
+  // The modal only opens once reference data has loaded, so `home` is set.
+  const [point, setPoint] = useState({ lat: home?.lat ?? 0, lng: home?.lng ?? 0 });
   const [description, setDescription] = useState("");
   const [landmark, setLandmark] = useState("");
   const [photos, setPhotos] = useState<Photo[]>([]);
@@ -239,34 +240,36 @@ export function ReportModal() {
 
   const pick = (c: CategoryDTO) => {
     setCategory(c);
-    setUrgency(c.defaultUrgency === "critical" ? "critical" : c.defaultUrgency);
+    setUrgency(c.defaultUrgency);
     setAnonymous(c.anonymousDefault);
     if (!c.isBlocked) setStep(2);
   };
 
   const isSos = !!category?.triggersSos;
-  const bounds = meta.data?.config.dhakaBounds;
-  const outside = bounds ? !inBounds(point, bounds) : false;
-  const urgencyChoices = (() => {
-    if (!category || isSos) return [];
-    const d = URGENCIES.indexOf(category.defaultUrgency);
-    return URGENCIES.filter((_, i) => Math.abs(i - d) <= 1 && i < 3);
-  })();
+  const cfg = meta.data?.config;
+  const outside = cfg ? !inBounds(point, cfg.dhakaBounds) : false;
+  const area = meta.data ? nearest(point, meta.data.areas) : undefined;
+  const urgencyChoices = category && !isSos ? allowedUrgencies(category.defaultUrgency) : [];
+  const maxPhotos = cfg?.maxPhotos ?? 3;
 
   const addPhotos = (files: FileList | null) => {
     if (!files) return;
     const next = [...photos];
     for (const f of Array.from(files)) {
-      if (next.length >= MAX_PHOTOS) break;
-      const err = !f.type.startsWith("image/") ? t("report.photoType") : f.size > MAX_BYTES ? t("report.photoTooLarge") : null;
+      if (next.length >= maxPhotos) break;
+      const err = !f.type.startsWith("image/") ? t("report.photoType") : f.size > (cfg?.maxPhotoBytes ?? Infinity) ? t("report.photoTooLarge") : null;
       next.push({ file: f, url: URL.createObjectURL(f), error: err });
     }
     setPhotos(next);
   };
   const okPhotos = photos.filter((p) => !p.error);
 
-  const descOk = description.trim().length >= 10;
-  const sosOk = !isSos || (child.name.trim() && child.age !== "" && child.clothing.trim().length >= 3 && okPhotos.length > 0);
+  // Same rules the server enforces (shared zod schemas).
+  const descOk = ReportInput.shape.description.safeParse(description).success;
+  const sosOk =
+    !isSos ||
+    (okPhotos.length > 0 &&
+      SosDetailsInput.safeParse({ childName: child.name, childAge: Number(child.age), clothing: child.clothing, lastSeenAt: fromLocalInput(child.lastSeen) }).success && child.age !== "");
   const canSubmit = descOk && sosOk && !outside && phase !== "sending" && phase !== "retrying";
 
   const submit = async () => {
@@ -298,7 +301,7 @@ export function ReportModal() {
         setResult(r);
         setPhase("idle");
         setStep("done");
-        void qc.invalidateQueries({ queryKey: qk.incidents });
+        upsertIncident(qc, r.incident);
         return;
       } catch (e) {
         if (e instanceof ApiFail && e.code === "network" && attempt < 2) {
@@ -313,32 +316,26 @@ export function ReportModal() {
     }
   };
 
-  const stepTitle = step === 1 ? t("report.step1") : step === 2 ? t("report.step2") : step === 3 ? t("report.step3") : t("report.successTitle");
-  const areaName = name(meta.data ? nearest(point, meta.data.areas) : undefined);
+  const stepTitle = step === "done" ? t("report.successTitle") : t(`report.step${step}`);
+  const areaName = name(area);
 
-  let footer = null;
-  if (step === 2)
-    footer = (
+  const footer =
+    step === 2 || step === 3 ? (
       <>
-        <button className="btn btn-ghost" onClick={() => setStep(1)}>
+        <button className="btn btn-ghost" onClick={() => setStep(step === 2 ? 1 : 2)}>
           {t("common.back")}
         </button>
-        <button className="btn btn-primary" disabled={outside} onClick={() => setStep(3)}>
-          {t("common.next")}
-        </button>
+        {step === 2 ? (
+          <button className="btn btn-primary" disabled={outside} onClick={() => setStep(3)}>
+            {t("common.next")}
+          </button>
+        ) : (
+          <button className={`btn ${isSos ? "btn-sos" : "btn-primary"}`} disabled={!canSubmit} onClick={() => void submit()}>
+            {phase === "sending" ? t("report.sending") : phase === "retrying" ? t("report.retrying") : isSos ? t("report.submitSos") : t("report.submit")}
+          </button>
+        )}
       </>
-    );
-  if (step === 3)
-    footer = (
-      <>
-        <button className="btn btn-ghost" onClick={() => setStep(2)}>
-          {t("common.back")}
-        </button>
-        <button className={`btn ${isSos ? "btn-sos" : "btn-primary"}`} disabled={!canSubmit} onClick={() => void submit()}>
-          {phase === "sending" ? t("report.sending") : phase === "retrying" ? t("report.retrying") : isSos ? t("report.submitSos") : t("report.submit")}
-        </button>
-      </>
-    );
+    ) : null;
 
   return (
     <Modal title={step === "done" ? stepTitle : `${t("report.title")} · ${stepTitle}`} onClose={closeReport} footer={footer} wide={step === 2}>
@@ -349,7 +346,7 @@ export function ReportModal() {
 
       {step === 1 ? category?.isBlocked ? <HotlineCard category={category} onBack={() => setCategory(null)} /> : <CategoryStep onPick={pick} /> : null}
 
-      {step === 2 ? <LocationStep point={point} setPoint={setPoint} /> : null}
+      {step === 2 ? <LocationStep point={point} setPoint={setPoint} outside={outside} area={area} /> : null}
 
       {step === 3 && category ? (
         <form className="report-step form" onSubmit={(e) => e.preventDefault()}>
@@ -417,7 +414,7 @@ export function ReportModal() {
                   </button>
                 </div>
               ))}
-              {photos.length < MAX_PHOTOS ? (
+              {photos.length < maxPhotos ? (
                 <label className="photo-add">
                   <Camera size={20} aria-hidden="true" />
                   <span>{t("report.addPhoto")}</span>

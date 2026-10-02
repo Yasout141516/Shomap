@@ -1,11 +1,11 @@
-import type { Status } from "@shomap/shared";
+import type { Status } from "./enums.js";
 
 /** Who is causing a transition. `community` = the 3-vote "still happening" reopen. */
 export type Actor = "citizen" | "authority" | "admin" | "system" | "community";
 
 type Edge = `${Status}>${Status}`;
 
-/** The state machine from PRD diagram 03. */
+/** The state machine from PRD diagram 03. Shared so the UI offers exactly the moves the server allows. */
 const EDGES: Record<Edge, Actor[]> = {
   "open>referred": ["system", "admin"],
   "open>removed": ["admin", "system"],

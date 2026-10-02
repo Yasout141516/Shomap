@@ -1,18 +1,19 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import type { MeDTO } from "@shomap/shared";
+import { LoginInput, homeRouteFor, type MeDTO } from "@shomap/shared";
 import { useI18n } from "../../i18n";
 import { ApiFail, api, errorText } from "../../lib/api";
 import { useDemoInfo, useMeta } from "../../lib/queries";
+import { describeUser } from "../../lib/demo";
+import { useLookup } from "../../lib/lookup";
 import { useSession } from "../../lib/session";
 
-const HERO_IDS = ["u-rahim", "u-nila", "u-shirin", "u-arif", "u-staff-thana-tejgaon", "u-admin"];
-
-/** PRD FR-1.1: phone + mock OTP (always 1234). Demo mode adds one-tap accounts. */
+/** PRD FR-1.1: phone + mock OTP (always 1234). Demo mode adds one-tap accounts for the script's cast. */
 export function LoginPage() {
   const { t, name } = useI18n();
   const nav = useNavigate();
   const meta = useMeta();
+  const lookup = useLookup();
   const demo = useDemoInfo(!!meta.data?.demoMode);
   const { afterChange, switchTo } = useSession();
   const [phone, setPhone] = useState("");
@@ -23,8 +24,8 @@ export function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const phoneOk = /^01\d{9}$/.test(phone);
-  const done = (me: MeDTO) => nav(me.role === "authority" ? "/authority" : me.role === "admin" ? "/admin" : "/");
+  const phoneOk = LoginInput.shape.phone.safeParse(phone).success;
+  const done = (me: MeDTO) => nav(homeRouteFor(me.role));
 
   const login = async () => {
     setBusy(true);
@@ -41,7 +42,7 @@ export function LoginPage() {
     }
   };
 
-  const heroes = (demo.data?.users ?? []).filter((u) => HERO_IDS.includes(u.id)).sort((a, b) => HERO_IDS.indexOf(a.id) - HERO_IDS.indexOf(b.id));
+  const heroes = (demo.data?.users ?? []).filter((u) => u.hero);
 
   return (
     <div className="page page-narrow">
@@ -50,19 +51,12 @@ export function LoginPage() {
         <section className="card">
           <h2>{t("auth.quickPick")}</h2>
           <div className="quick-picks">
-            {heroes.map((u) => {
-              const area = meta.data?.areas.find((a) => a.id === u.homeAreaId);
-              const auth = meta.data?.authorities.find((a) => a.id === u.authorityId);
-              return (
-                <button key={u.id} className="quick-pick" onClick={() => void switchTo(u.id).then(done)}>
-                  <strong>{u.displayName}</strong>
-                  <span className="muted small">
-                    {t(`roles.${u.role}`)}
-                    {area ? ` · ${name(area)}` : auth ? ` · ${name(auth)}` : ""}
-                  </span>
-                </button>
-              );
-            })}
+            {heroes.map((u) => (
+              <button key={u.id} className="quick-pick" onClick={() => void switchTo(u.id).then(done)}>
+                <strong>{u.displayName}</strong>
+                <span className="muted small">{describeUser(u, t, name, lookup)}</span>
+              </button>
+            ))}
           </div>
           <p className="muted small">{t("auth.or")}</p>
         </section>

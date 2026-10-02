@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "ef4f4be3-1a18-49f9-8699-f9d3b0431cac",
+  "id": "d70c65d2-b34d-4d50-b4b7-01178627b5bc",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "abuse_flags": {
@@ -74,6 +74,13 @@
             "flagged_by"
           ],
           "isUnique": true
+        },
+        "abuse_flags_incident_idx": {
+          "name": "abuse_flags_incident_idx",
+          "columns": [
+            "incident_id"
+          ],
+          "isUnique": false
         }
       },
       "foreignKeys": {
@@ -495,7 +502,15 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "incident_media_incident_idx": {
+          "name": "incident_media_incident_idx",
+          "columns": [
+            "incident_id"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {
         "incident_media_incident_id_incidents_id_fk": {
           "name": "incident_media_incident_id_incidents_id_fk",
@@ -627,15 +642,16 @@
           "autoincrement": false,
           "default": 0
         },
-        "review_reason": {
-          "name": "review_reason",
-          "type": "text",
+        "redirected": {
+          "name": "redirected",
+          "type": "integer",
           "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
         },
-        "review_note": {
-          "name": "review_note",
+        "redirect_note": {
+          "name": "redirect_note",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -1096,6 +1112,13 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "reviewed_at": {
+          "name": "reviewed_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {
@@ -1157,6 +1180,14 @@
           "notNull": true,
           "autoincrement": false
         },
+        "kind": {
+          "name": "kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'status'"
+        },
         "from_status": {
           "name": "from_status",
           "type": "text",
@@ -1177,6 +1208,21 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "note_key": {
+          "name": "note_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "note_params": {
+          "name": "note_params",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'{}'"
         },
         "created_at": {
           "name": "created_at",
@@ -1531,7 +1577,15 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "watch_zones_user_idx": {
+          "name": "watch_zones_user_idx",
+          "columns": [
+            "user_id"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {
         "watch_zones_user_id_users_id_fk": {
           "name": "watch_zones_user_id_users_id_fk",

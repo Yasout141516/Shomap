@@ -61,3 +61,10 @@ export const WATCH_RADII = [500, 1000, 2000, 5000] as const;
 
 export const DASHBOARD_SCOPES = ["home", "zone", "all"] as const;
 export type DashboardScope = (typeof DASHBOARD_SCOPES)[number];
+
+export const QUEUE_REASONS = ["sos_review", "disputed", "flagged", "redirected"] as const;
+export type QueueReason = (typeof QUEUE_REASONS)[number];
+
+/** What a timeline entry records: a lifecycle move, a trust change, or an SOS alert change. */
+export const EVENT_KINDS = ["status", "verification", "sos"] as const;
+export type EventKind = (typeof EVENT_KINDS)[number];

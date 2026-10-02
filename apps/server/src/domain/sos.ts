@@ -1,4 +1,4 @@
-import { circlesOverlap, haversineM, type LatLng } from "./geo.js";
+import { circlesOverlap, haversineM, type LatLng } from "@shomap/shared";
 
 export interface SosCircle extends LatLng {
   radiusM: number;

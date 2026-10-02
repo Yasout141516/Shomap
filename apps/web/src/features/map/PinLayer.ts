@@ -1,7 +1,8 @@
 import maplibregl, { type Map as MlMap } from "maplibre-gl";
 import Supercluster from "supercluster";
-import { URGENCIES, URGENCY_ORDER, type IncidentDTO, type Urgency } from "@shomap/shared";
+import { HOUR_MS, URGENCIES, URGENCY_ORDER, type IncidentDTO, type Urgency } from "@shomap/shared";
 import { pinSvg, URGENCY_COLOR } from "../../ui/pin";
+import { isDone } from "./filters";
 import { categoryIconSvg } from "../../ui/icons";
 
 interface PinProps {
@@ -16,7 +17,6 @@ export interface PinLayerOptions {
   onSelect: (id: string) => void;
 }
 
-const HOUR = 3_600_000;
 
 /**
  * HTML markers over MapLibre: each pin is a real <button> (focusable, labelled for screen
@@ -44,10 +44,9 @@ export class PinLayer {
     map.on("moveend", this.onMove);
   }
 
+  /** New labels (e.g. after a language switch). Pin signatures include the label, so render() swaps them. */
   setOptions(opts: PinLayerOptions) {
     this.opts = opts;
-    for (const { marker } of this.markers.values()) marker.remove();
-    this.markers.clear();
     this.render();
   }
 
@@ -92,7 +91,7 @@ export class PinLayer {
         const u = URGENCIES[props.maxU] as Urgency;
         want.set(`c-${clusterId}`, {
           lngLat: [lng, lat],
-          sig: `${count}|${u}`,
+          sig: `${count}|${u}|${this.opts.clusterLabel(count)}`,
           build: () => {
             const el = document.createElement("button");
             el.className = `cluster u-${u}`;
@@ -132,8 +131,8 @@ export class PinLayer {
 
   private pinSpec(inc: IncidentDTO, now: number) {
     const sosActive = inc.sos?.state === "active";
-    const fresh = inc.urgency === "high" && now - Date.parse(inc.createdAt) < HOUR;
-    const faded = inc.status === "resolved" || inc.status === "closed";
+    const fresh = inc.urgency === "high" && now - Date.parse(inc.createdAt) < HOUR_MS;
+    const faded = isDone(inc);
     const label = this.opts.label(inc);
     const icon = this.opts.iconFor(inc.categoryId);
     return {

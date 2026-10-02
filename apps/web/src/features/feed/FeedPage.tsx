@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import { useI18n } from "../../i18n";
 import { haversineM } from "../../lib/geo";
 import { relTime } from "../../lib/format";
-import { useIncidents, useMeta, useZones } from "../../lib/queries";
+import { useLookup } from "../../lib/lookup";
+import { useIncidents, useZones } from "../../lib/queries";
 import { useHomeAreaId, useSession } from "../../lib/session";
 import { EmptyState, ErrorState, Skeleton } from "../../ui/states";
 import { IncidentCard } from "../incident/IncidentCard";
@@ -11,13 +12,12 @@ import { IncidentCard } from "../incident/IncidentCard";
 /** PRD FR-5.6: incidents in my home area and watch zones, latest activity first. */
 export function FeedPage() {
   const { t, name, lang } = useI18n();
-  const meta = useMeta();
+  const lookup = useLookup();
   const { me } = useSession();
   const homeAreaId = useHomeAreaId();
   const incidents = useIncidents();
-  const zones = useZones(!!me && me.role === "citizen");
-
-  const home = meta.data?.areas.find((a) => a.id === homeAreaId);
+  const zones = useZones();
+  const home = lookup.area(homeAreaId);
   const items = useMemo(() => {
     const zs = zones.data ?? [];
     return (incidents.data ?? [])

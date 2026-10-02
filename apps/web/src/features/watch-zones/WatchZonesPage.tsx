@@ -1,15 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
 import maplibregl, { type Map as MlMap } from "maplibre-gl";
 import { Trash2 } from "lucide-react";
 import { URGENCIES, WATCH_RADII, type Urgency } from "@shomap/shared";
 import { useI18n } from "../../i18n";
-import { api, errorText } from "../../lib/api";
-import { useApp } from "../../lib/appState";
+import { api } from "../../lib/api";
+import { useAction } from "../../lib/actions";
 import { circlePolygon } from "../../lib/geo";
 import { qk, useMeta, useZones } from "../../lib/queries";
-import { useHomeAreaId, useSession } from "../../lib/session";
+import { useHomeArea, useSession } from "../../lib/session";
 import { EmptyState, ErrorState, Skeleton } from "../../ui/states";
 import { BaseMap } from "../map/BaseMap";
 import { setCircleLayer } from "../map/PinLayer";
@@ -19,18 +18,15 @@ export function WatchZonesPage() {
   const { t, n } = useI18n();
   const meta = useMeta();
   const { me } = useSession();
-  const homeAreaId = useHomeAreaId();
-  const zones = useZones(!!me);
-  const qc = useQueryClient();
-  const { toast } = useApp();
-  const home = meta.data?.areas.find((a) => a.id === homeAreaId) ?? meta.data?.areas[0];
+  const home = useHomeArea();
+  const zones = useZones();
+  const { run, busy } = useAction();
 
   const [map, setMap] = useState<MlMap | null>(null);
   const [center, setCenter] = useState<{ lat: number; lng: number } | null>(null);
   const [label, setLabel] = useState("");
   const [radius, setRadius] = useState<number>(1000);
   const [minUrgency, setMinUrgency] = useState<Urgency>("high");
-  const [busy, setBusy] = useState(false);
   const marker = useRef<maplibregl.Marker | null>(null);
 
   useEffect(() => {
@@ -59,33 +55,22 @@ export function WatchZonesPage() {
     );
   }
 
-  const full = (zones.data?.length ?? 0) >= 5;
+  const full = (zones.data?.length ?? 0) >= (meta.data?.config.maxWatchZones ?? 5);
   const save = async () => {
     if (!center || !label.trim()) return;
-    setBusy(true);
-    try {
-      await api("/api/watch-zones", { body: { label: label.trim(), lat: center.lat, lng: center.lng, radiusM: radius, minUrgency } });
-      toast(t("zones.saved", { label: label.trim() }), "success");
-      setLabel("");
-      setCenter(null);
-      marker.current?.remove();
-      marker.current = null;
-      void qc.invalidateQueries({ queryKey: qk.zones });
-    } catch (e) {
-      toast(errorText(e, t), "error");
-    } finally {
-      setBusy(false);
-    }
+    const zoneLabel = label.trim();
+    const ok = await run(() => api("/api/watch-zones", { body: { label: zoneLabel, lat: center.lat, lng: center.lng, radiusM: radius, minUrgency } }), {
+      success: t("zones.saved", { label: zoneLabel }),
+      invalidate: [qk.zones],
+    });
+    if (ok === undefined) return;
+    setLabel("");
+    setCenter(null);
+    marker.current?.remove();
+    marker.current = null;
   };
-  const remove = async (id: string, zoneLabel: string) => {
-    try {
-      await api(`/api/watch-zones/${id}`, { method: "DELETE" });
-      toast(t("zones.deleted", { label: zoneLabel }), "info");
-      void qc.invalidateQueries({ queryKey: qk.zones });
-    } catch (e) {
-      toast(errorText(e, t), "error");
-    }
-  };
+  const remove = (id: string, zoneLabel: string) =>
+    void run(() => api(`/api/watch-zones/${id}`, { method: "DELETE" }), { success: t("zones.deleted", { label: zoneLabel }), invalidate: [qk.zones] });
   const radiusLabel = (r: number) => (r >= 1000 ? t("units.km", { n: n(r / 1000) }) : t("units.m", { n: n(r) }));
 
   return (
@@ -110,7 +95,7 @@ export function WatchZonesPage() {
                       {radiusLabel(z.radiusM)} · {t("zones.andAbove", { level: t(`urgency.${z.minUrgency}`) })}
                     </p>
                   </div>
-                  <button className="icon-btn" onClick={() => void remove(z.id, z.label)} aria-label={`${t("zones.delete")}: ${z.label}`}>
+                  <button className="icon-btn" onClick={() => remove(z.id, z.label)} aria-label={`${t("zones.delete")}: ${z.label}`}>
                     <Trash2 size={18} />
                   </button>
                 </li>

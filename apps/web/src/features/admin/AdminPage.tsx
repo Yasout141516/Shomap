@@ -1,51 +1,46 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
-import type { AdminAction, QueueItemDTO } from "@shomap/shared";
+import { QUEUE_REASONS, type AdminAction, type QueueItemDTO, type QueueReason } from "@shomap/shared";
 import { useI18n } from "../../i18n";
-import { api, errorText } from "../../lib/api";
-import { useApp } from "../../lib/appState";
+import { api } from "../../lib/api";
+import { useAction } from "../../lib/actions";
+import { eventLabelKey } from "../../lib/events";
 import { relTime } from "../../lib/format";
+import { useLookup } from "../../lib/lookup";
 import { qk, useAdminQueue, useEventLog, useMeta } from "../../lib/queries";
 import { useSession } from "../../lib/session";
 import { AnonymousBadge, UrgencyBadge, VerificationBadge } from "../../ui/badges";
-import { Modal } from "../../ui/Modal";
+import { NoteDialog } from "../../ui/NoteDialog";
 import { EmptyState, ErrorState, Skeleton } from "../../ui/states";
-
-const TABS = ["sos_review", "disputed", "flagged", "redirected"] as const;
-type Tab = (typeof TABS)[number];
 
 export function AdminPage() {
   const { t, name, lang, n } = useI18n();
   const { me } = useSession();
   const meta = useMeta();
+  const lookup = useLookup();
   const isAdmin = me?.role === "admin";
   const q = useAdminQueue(isAdmin);
   const events = useEventLog(isAdmin);
-  const qc = useQueryClient();
-  const { toast } = useApp();
-  const [tab, setTab] = useState<Tab>("sos_review");
+  const { run, busy } = useAction();
+  const [tab, setTab] = useState<QueueReason>("sos_review");
   const [dialog, setDialog] = useState<{ item: QueueItemDTO; action: "remove" | "refer" } | null>(null);
-  const [note, setNote] = useState("");
   const [authorityId, setAuthorityId] = useState("");
 
   const counts = useMemo(() => {
-    const c: Record<Tab, number> = { sos_review: 0, disputed: 0, flagged: 0, redirected: 0 };
-    for (const i of q.data ?? []) c[i.reason]++;
+    const c = new Map<QueueReason, number>();
+    for (const i of q.data ?? []) c.set(i.reason, (c.get(i.reason) ?? 0) + 1);
     return c;
   }, [q.data]);
 
-  if (!isAdmin) return <div className="page"><EmptyState title={t("admin.notAdmin")} /></div>;
+  if (!isAdmin)
+    return (
+      <div className="page">
+        <EmptyState title={t("admin.notAdmin")} />
+      </div>
+    );
 
-  const act = async (incidentId: string, action: AdminAction, extra: { note?: string; authorityId?: string } = {}) => {
-    try {
-      await api(`/api/admin/incidents/${incidentId}/actions`, { body: { action, ...extra } });
-      void qc.invalidateQueries({ queryKey: qk.adminQueue });
-      void qc.invalidateQueries({ queryKey: qk.events });
-    } catch (e) {
-      toast(errorText(e, t), "error");
-    }
-  };
+  const act = (incidentId: string, action: AdminAction, extra: { note?: string; authorityId?: string } = {}) =>
+    void run(() => api(`/api/admin/incidents/${incidentId}/actions`, { body: { action, ...extra } }), { invalidate: [qk.adminQueue, qk.events] });
 
   const items = (q.data ?? []).filter((i) => i.reason === tab);
 
@@ -57,9 +52,9 @@ export function AdminPage() {
       <div className="admin-layout">
         <section>
           <div className="tabs" role="tablist">
-            {TABS.map((k) => (
+            {QUEUE_REASONS.map((k) => (
               <button key={k} role="tab" aria-selected={tab === k} className={tab === k ? "on" : ""} onClick={() => setTab(k)}>
-                {t(`admin.tabs.${k}`)} {counts[k] ? <span className="count-badge">{n(counts[k])}</span> : null}
+                {t(`admin.tabs.${k}`)} {counts.get(k) ? <span className="count-badge">{n(counts.get(k)!)}</span> : null}
               </button>
             ))}
           </div>
@@ -73,16 +68,14 @@ export function AdminPage() {
             <ul className="review-list">
               {items.map((item) => {
                 const inc = item.incident;
-                const cat = meta.data?.categories.find((c) => c.id === inc.categoryId);
-                const area = meta.data?.areas.find((a) => a.id === inc.areaId);
                 return (
                   <li key={`${item.reason}-${inc.id}`} className="card review-item">
                     <div className="review-main">
                       <Link to={`/incident/${inc.id}`} className="queue-title">
-                        {inc.sos ? `${t("sos.banner")}: ${inc.sos.childName}, ${inc.sos.childAge}` : name(cat)}
+                        {inc.sos ? `${t("sos.banner")}: ${inc.sos.childName}, ${inc.sos.childAge}` : name(lookup.category(inc.categoryId))}
                       </Link>
                       <p className="muted small">
-                        {name(area)} · {relTime(inc.createdAt, lang)} · {t("authority.reporter")}: {inc.reporter?.displayName ?? "?"}
+                        {name(lookup.area(inc.areaId))} · {relTime(inc.createdAt, lang)} · {t("authority.reporter")}: {inc.reporter?.displayName ?? "?"}
                       </p>
                       {inc.isAnonymous ? <AnonymousBadge label={t("incident.anonymousToPublic")} /> : null}
                       <p className="small">{inc.description}</p>
@@ -96,16 +89,16 @@ export function AdminPage() {
                     <div className="review-actions">
                       {item.reason === "sos_review" ? (
                         <>
-                          <button className="btn btn-primary btn-sm" onClick={() => void act(inc.id, "clear_review")}>
+                          <button className="btn btn-primary btn-sm" disabled={busy} onClick={() => act(inc.id, "clear_review")}>
                             {t("admin.approve")}
                           </button>
-                          <button className="btn btn-sos btn-sm" onClick={() => void act(inc.id, "retract_sos")}>
+                          <button className="btn btn-sos btn-sm" disabled={busy} onClick={() => act(inc.id, "retract_sos")}>
                             {t("admin.retract")}
                           </button>
                         </>
                       ) : null}
                       {item.reason === "disputed" || item.reason === "flagged" ? (
-                        <button className="btn btn-primary btn-sm" onClick={() => void act(inc.id, "verify")}>
+                        <button className="btn btn-primary btn-sm" disabled={busy} onClick={() => act(inc.id, "verify")}>
                           {t("admin.verify")}
                         </button>
                       ) : null}
@@ -115,7 +108,7 @@ export function AdminPage() {
                         </button>
                       ) : null}
                       {item.reason === "flagged" ? (
-                        <button className="btn btn-ghost btn-sm" onClick={() => void act(inc.id, "dismiss_flags")}>
+                        <button className="btn btn-ghost btn-sm" disabled={busy} onClick={() => act(inc.id, "dismiss_flags")}>
                           {t("admin.dismissFlags")}
                         </button>
                       ) : null}
@@ -136,7 +129,7 @@ export function AdminPage() {
             <ol>
               {events.data.map((e) => (
                 <li key={e.id}>
-                  <Link to={`/incident/${e.incidentId}`}>{t(`events.${e.toStatus}`)}</Link>
+                  <Link to={`/incident/${e.incidentId}`}>{t(eventLabelKey(e))}</Link>
                   <span className="muted small">
                     {" "}
                     · {e.actorName ?? t("common.system")} · {relTime(e.createdAt, lang)}
@@ -150,51 +143,35 @@ export function AdminPage() {
         </aside>
       </div>
 
-      {dialog ? (
-        <Modal
-          title={dialog.action === "remove" ? t("admin.remove") : t("admin.refer")}
-          onClose={() => setDialog(null)}
-          footer={
-            <>
-              <button className="btn btn-ghost" onClick={() => setDialog(null)}>
-                {t("common.cancel")}
-              </button>
-              <button
-                className="btn btn-primary"
-                disabled={dialog.action === "remove" ? note.trim().length < 3 : !authorityId}
-                onClick={() => {
-                  void act(dialog.item.incident.id, dialog.action, dialog.action === "remove" ? { note: note.trim() } : { authorityId });
-                  setDialog(null);
-                  setNote("");
-                  setAuthorityId("");
-                }}
-              >
-                {t("authority.confirm")}
-              </button>
-            </>
-          }
+      {dialog?.action === "remove" ? (
+        <NoteDialog title={t("admin.remove")} label={t("admin.removeReason")} onConfirm={(note) => act(dialog.item.incident.id, "remove", { note })} onClose={() => setDialog(null)} />
+      ) : null}
+      {dialog?.action === "refer" ? (
+        <NoteDialog
+          title={t("admin.refer")}
+          label=""
+          required={false}
+          canConfirm={!!authorityId}
+          onConfirm={() => act(dialog.item.incident.id, "refer", { authorityId })}
+          onClose={() => {
+            setDialog(null);
+            setAuthorityId("");
+          }}
         >
-          {dialog.action === "remove" ? (
-            <label className="field">
-              <span className="field-label">{t("admin.removeReason")}</span>
-              <textarea id="admin-remove-reason" rows={3} value={note} onChange={(e) => setNote(e.target.value)} />
-            </label>
-          ) : (
-            <label className="field">
-              <span className="field-label">{t("admin.referTo")}</span>
-              <select id="admin-refer-to" value={authorityId} onChange={(e) => setAuthorityId(e.target.value)}>
-                <option value="" disabled>
-                  …
+          <label className="field">
+            <span className="field-label">{t("admin.referTo")}</span>
+            <select id="admin-refer-to" value={authorityId} onChange={(e) => setAuthorityId(e.target.value)}>
+              <option value="" disabled>
+                …
+              </option>
+              {meta.data?.authorities.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {name(a)}
                 </option>
-                {meta.data?.authorities.map((a) => (
-                  <option key={a.id} value={a.id}>
-                    {name(a)}
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
-        </Modal>
+              ))}
+            </select>
+          </label>
+        </NoteDialog>
       ) : null}
     </div>
   );

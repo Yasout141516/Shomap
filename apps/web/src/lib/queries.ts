@@ -63,12 +63,15 @@ export const useNotifications = (enabled: boolean) =>
     enabled,
   });
 
-export const useZones = (enabled: boolean) =>
-  useQuery({
+/** The logged-in citizen's watch zones (nothing for guests and staff). */
+export function useZones() {
+  const me = useMe();
+  return useQuery({
     queryKey: qk.zones,
     queryFn: async () => (await api<{ zones: WatchZoneDTO[] }>("/api/watch-zones")).zones,
-    enabled,
+    enabled: me.data?.role === "citizen",
   });
+}
 
 /** `id` is the zone id for scope "zone", or the home area id for scope "home". */
 export const useDashboard = (scope: DashboardScope, id?: string) =>

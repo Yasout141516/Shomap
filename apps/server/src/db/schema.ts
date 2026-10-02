@@ -75,9 +75,9 @@ export const incidents = sqliteTable(
     confirmCount: integer("confirm_count").notNull().default(0),
     disputeCount: integer("dispute_count").notNull().default(0),
     stillCount: integer("still_count").notNull().default(0),
-    /** Admin queue marker: 'sos_review' | 'redirected' | null. Disputed and flagged are derived. */
-    reviewReason: text("review_reason"),
-    reviewNote: text("review_note"),
+    /** No authority covers this report (or one sent it back): it waits in the admin "Redirected" tab. */
+    redirected: integer("redirected", { mode: "boolean" }).notNull().default(false),
+    redirectNote: text("redirect_note"),
     idempotencyKey: text("idempotency_key").unique(),
     occurredAt: text("occurred_at").notNull(),
     createdAt: text("created_at").notNull(),
@@ -90,13 +90,17 @@ export const incidents = sqliteTable(
   }),
 );
 
-export const incidentMedia = sqliteTable("incident_media", {
-  id: text("id").primaryKey(),
-  incidentId: text("incident_id").notNull().references(() => incidents.id),
-  url: text("url").notNull(),
-  publicHidden: integer("public_hidden", { mode: "boolean" }).notNull().default(false),
-  createdAt: text("created_at").notNull(),
-});
+export const incidentMedia = sqliteTable(
+  "incident_media",
+  {
+    id: text("id").primaryKey(),
+    incidentId: text("incident_id").notNull().references(() => incidents.id),
+    url: text("url").notNull(),
+    publicHidden: integer("public_hidden", { mode: "boolean" }).notNull().default(false),
+    createdAt: text("created_at").notNull(),
+  },
+  (t) => ({ byIncident: index("incident_media_incident_idx").on(t.incidentId) }),
+);
 
 export const verifications = sqliteTable(
   "verifications",
@@ -158,24 +162,34 @@ export const statusEvents = sqliteTable(
     incidentId: text("incident_id").notNull().references(() => incidents.id),
     actorId: text("actor_id"),
     actorRole: text("actor_role").notNull(),
+    /** status = lifecycle move; verification = trust change; sos = alert state change. */
+    kind: text("kind", { enum: ["status", "verification", "sos"] }).notNull().default("status"),
     fromStatus: text("from_status"),
     toStatus: text("to_status").notNull(),
+    /** Free text written by a person. */
     note: text("note"),
+    /** System notes: an i18n key under `eventNotes.` plus JSON params, so they translate. */
+    noteKey: text("note_key"),
+    noteParams: text("note_params").notNull().default("{}"),
     createdAt: text("created_at").notNull(),
   },
   (t) => ({ byIncident: index("status_events_incident_idx").on(t.incidentId, t.createdAt) }),
 );
 
-export const watchZones = sqliteTable("watch_zones", {
-  id: text("id").primaryKey(),
-  userId: text("user_id").notNull().references(() => users.id),
-  label: text("label").notNull(),
-  lat: real("center_lat").notNull(),
-  lng: real("center_lng").notNull(),
-  radiusM: integer("radius_m").notNull(),
-  minUrgency: text("min_urgency", { enum: ["low", "medium", "high", "critical"] }).notNull(),
-  createdAt: text("created_at").notNull(),
-});
+export const watchZones = sqliteTable(
+  "watch_zones",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id").notNull().references(() => users.id),
+    label: text("label").notNull(),
+    lat: real("center_lat").notNull(),
+    lng: real("center_lng").notNull(),
+    radiusM: integer("radius_m").notNull(),
+    minUrgency: text("min_urgency", { enum: ["low", "medium", "high", "critical"] }).notNull(),
+    createdAt: text("created_at").notNull(),
+  },
+  (t) => ({ byUser: index("watch_zones_user_idx").on(t.userId) }),
+);
 
 export const sosAlerts = sqliteTable("sos_alerts", {
   id: text("id").primaryKey(),
@@ -191,6 +205,8 @@ export const sosAlerts = sqliteTable("sos_alerts", {
   issuedAt: text("issued_at").notNull(),
   expiresAt: text("expires_at").notNull(),
   closedAt: text("closed_at"),
+  /** Moderator review of the alert (FR-8.6). Null = still pending review. */
+  reviewedAt: text("reviewed_at"),
 });
 
 export const notifications = sqliteTable(
@@ -221,7 +237,10 @@ export const abuseFlags = sqliteTable(
     state: text("state", { enum: ["open", "actioned", "dismissed"] }).notNull().default("open"),
     createdAt: text("created_at").notNull(),
   },
-  (t) => ({ onePerUser: uniqueIndex("abuse_flags_target_user").on(t.targetType, t.targetId, t.flaggedBy) }),
+  (t) => ({
+    onePerUser: uniqueIndex("abuse_flags_target_user").on(t.targetType, t.targetId, t.flaggedBy),
+    byIncident: index("abuse_flags_incident_idx").on(t.incidentId),
+  }),
 );
 
 export const appState = sqliteTable("app_state", {

@@ -1,21 +1,109 @@
 {
-  "app": { "name": "ShoMap", "tagline": "Report. Receive. Respond." },
-  "nav": { "map": "Map", "feed": "Feed", "dashboard": "Dashboard", "alerts": "Alerts", "me": "Me", "report": "Report", "authority": "Referral queue", "admin": "Review queue", "demo": "Demo controls", "zones": "Watch zones", "myReports": "My reports" },
-  "common": {
-    "loading": "Loading…", "retry": "Try again", "back": "Back", "close": "Close", "cancel": "Cancel", "save": "Save", "delete": "Delete",
-    "send": "Send", "next": "Next", "done": "Done", "anonymous": "Anonymous", "you": "You", "youHidden": "You · hidden from public",
-    "optional": "optional", "demoAccount": "Demo account", "logout": "Log out", "login": "Log in", "viewOnMap": "View on map",
-    "language": "Language", "moderators": "ShoMap moderators", "system": "ShoMap", "copied": "Link copied", "copyFailed": "Couldn't copy. Select the link instead."
+  "nav": {
+    "map": "Map",
+    "feed": "Feed",
+    "dashboard": "Dashboard",
+    "alerts": "Alerts",
+    "me": "Me",
+    "report": "Report",
+    "authority": "Referral queue",
+    "admin": "Review queue",
+    "demo": "Demo controls",
+    "zones": "Watch zones",
+    "myReports": "My reports"
   },
-  "roles": { "citizen": "Citizen", "authority": "Authority", "admin": "Moderator" },
-  "urgency": { "low": "Low", "medium": "Medium", "high": "High", "critical": "SOS", "label": "Urgency" },
-  "verification": { "unverified": "Unverified", "verified": "Verified by {{count}} neighbours", "verifiedShort": "Verified", "disputed": "Disputed" },
-  "status": { "open": "Open", "referred": "Referred", "acknowledged": "Acknowledged", "in_progress": "In progress", "resolved": "Resolved", "closed": "Closed", "removed": "Removed" },
-  "tracker": { "reported": "Reported", "verified": "Verified", "referred": "Referred", "resolved": "Resolved" },
+  "common": {
+    "retry": "Try again",
+    "back": "Back",
+    "close": "Close",
+    "cancel": "Cancel",
+    "save": "Save",
+    "send": "Send",
+    "next": "Next",
+    "anonymous": "Anonymous",
+    "you": "You",
+    "youHidden": "You · hidden from public",
+    "optional": "optional",
+    "demoAccount": "Demo account",
+    "logout": "Log out",
+    "login": "Log in",
+    "language": "Language",
+    "moderators": "ShoMap moderators",
+    "system": "ShoMap",
+    "copied": "Link copied",
+    "copyFailed": "Couldn't copy. Select the link instead."
+  },
+  "roles": {
+    "citizen": "Citizen",
+    "authority": "Authority",
+    "admin": "Moderator"
+  },
+  "urgency": {
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "critical": "SOS",
+    "label": "Urgency"
+  },
+  "verification": {
+    "unverified": "Unverified",
+    "verified": "Verified by {{count}} neighbours",
+    "verifiedShort": "Verified",
+    "disputed": "Disputed"
+  },
+  "status": {
+    "open": "Open",
+    "referred": "Referred",
+    "acknowledged": "Acknowledged",
+    "in_progress": "In progress",
+    "resolved": "Resolved",
+    "closed": "Closed",
+    "removed": "Removed"
+  },
+  "tracker": {
+    "reported": "Reported",
+    "verified": "Verified",
+    "referred": "Referred",
+    "resolved": "Resolved"
+  },
   "events": {
-    "open": "Reported", "referred": "Referred", "acknowledged": "Acknowledged", "in_progress": "In progress", "resolved": "Resolved",
-    "closed": "Closed", "removed": "Removed", "verified": "Verified", "disputed": "Disputed", "unverified": "Back to unverified",
-    "sos_found": "Found safe", "sos_cancelled": "Alert withdrawn", "sos_expired": "Alert expired", "sos_approved": "Alert reviewed by moderators"
+    "reported": "Reported",
+    "status": {
+      "open": "Sent back for reassignment",
+      "referred": "Referred",
+      "acknowledged": "Acknowledged",
+      "in_progress": "In progress",
+      "resolved": "Resolved",
+      "closed": "Closed",
+      "removed": "Removed"
+    },
+    "verification": {
+      "verified": "Verified",
+      "disputed": "Disputed",
+      "unverified": "Back to unverified"
+    },
+    "sos": {
+      "found": "Found safe",
+      "cancelled": "Alert withdrawn",
+      "expired": "Alert expired",
+      "reviewed": "Alert reviewed by moderators"
+    }
+  },
+  "eventNotes": {
+    "referredAuto": "Verified by neighbours. Referred automatically.",
+    "referredCritical": "Critical report. Referred immediately.",
+    "referredAdmin": "Referred by ShoMap moderators.",
+    "confirmedBy": "Confirmed by {{count}} neighbours.",
+    "disputedBy": "Disputed by {{count}} neighbours.",
+    "reopened": "Reopened: {{count}} neighbours say it is still happening.",
+    "autoClosed": "Closed after {{hours}} hours with no objection.",
+    "sosExpired": "Alert expired after {{hours}} hours.",
+    "unverifiedExpired": "Expired after {{days}} days without confirmation.",
+    "verifiedByModerators": "Verified by moderators.",
+    "sosFound": "Found safe.",
+    "sosCancelled": "Cancelled by the reporter.",
+    "sosWithdrawn": "Withdrawn by moderators.",
+    "sosReviewed": "Reviewed by moderators."
   },
   "map": {
     "headline": "{{count}} things neighbours reported in {{area}} this week.",
@@ -29,12 +117,22 @@
     "listTitle": "Nearby reports",
     "showList": "Show list",
     "hideList": "Hide list",
-    "cluster": "{{count}} reports here. Zoom in.",
-    "areaLabel": "Area: {{area}}"
+    "cluster": "{{count}} reports here. Zoom in."
   },
   "filters": {
-    "title": "Filters", "category": "Category", "urgency": "Urgency", "verification": "Trust", "status": "Status", "time": "Time",
-    "all": "All", "active": "Active", "resolved": "Resolved", "h24": "24 h", "d7": "7 days", "d14": "14 days", "clear": "Clear filters",
+    "title": "Filters",
+    "category": "Category",
+    "urgency": "Urgency",
+    "verification": "Trust",
+    "status": "Status",
+    "time": "Time",
+    "all": "All",
+    "active": "Active",
+    "resolved": "Resolved",
+    "h24": "24 h",
+    "d7": "7 days",
+    "d14": "14 days",
+    "clear": "Clear filters",
     "showing": "Showing {{count}}"
   },
   "report": {
@@ -125,14 +223,10 @@
     "flagged": "Thanks. Moderators will take a look.",
     "notFound": "This report couldn't be opened. It may have been removed.",
     "backToMap": "Back to the map",
-    "reportedBy": "Reported by {{name}}",
     "anonymousToPublic": "Anonymous to public",
-    "happened": "Happened {{time}}",
     "reply": "Reply",
     "replyingTo": "Replying",
-    "official": "Official",
     "share": "Copy link",
-    "photosHidden": "Photo hidden",
     "markFound": "My child has been found",
     "cancelAlert": "Cancel the alert",
     "demoConfirm": "Demo: add a neighbour's confirmation",
@@ -142,8 +236,19 @@
     "factAuthority": "Handled by",
     "close": "Close details"
   },
-  "commentKind": { "comment": "Comment", "update": "Update", "sighting": "Sighting", "offer_help": "Offer help", "official": "Official update" },
-  "flagReason": { "false": "It's false", "offensive": "Offensive", "personal_info": "Shares personal info", "spam": "Spam" },
+  "commentKind": {
+    "comment": "Comment",
+    "update": "Update",
+    "sighting": "Sighting",
+    "offer_help": "Offer help",
+    "official": "Official update"
+  },
+  "flagReason": {
+    "false": "It's false",
+    "offensive": "Offensive",
+    "personal_info": "Shares personal info",
+    "spam": "Spam"
+  },
   "sos": {
     "banner": "SOS · Missing child",
     "age": "{{age}} years old",
@@ -156,7 +261,6 @@
     "sightingSent": "Thank you. The family has been told.",
     "share": "Copy link",
     "collapse": "Collapse",
-    "expand": "Show alert",
     "found": "Found safe. Thank you, {{area}}.",
     "cancelled": "This alert was withdrawn by moderators.",
     "expired": "This alert expired after 72 hours.",
@@ -224,7 +328,6 @@
     "reopened_authority": "Reopened by {{count}} neighbours: {{category}} in {{area}}"
   },
   "me": {
-    "title": "Me",
     "homeArea": "Home area",
     "chooseArea": "Choose an area",
     "myReports": "My reports",
@@ -242,7 +345,6 @@
     "labelPlaceholder": "Home, Office, Child's school",
     "radius": "Radius",
     "minUrgency": "Notify me about",
-    "minUrgencyHelp": "This level and above",
     "tapMap": "Tap the map to set the centre.",
     "empty": "Follow places you care about: home, office, your child's school.",
     "saved": "Now watching {{label}}",
@@ -298,7 +400,12 @@
   },
   "admin": {
     "title": "Review queue",
-    "tabs": { "sos_review": "SOS pending review", "disputed": "Disputed", "flagged": "Flagged", "redirected": "Redirected" },
+    "tabs": {
+      "sos_review": "SOS pending review",
+      "disputed": "Disputed",
+      "flagged": "Flagged",
+      "redirected": "Redirected"
+    },
     "empty": "Nothing to review 🎉",
     "verify": "Verify",
     "remove": "Remove",
@@ -360,5 +467,8 @@
     "network": "No connection to ShoMap. Check the hotspot and try again."
   },
   "reconnecting": "Reconnecting…",
-  "units": { "m": "{{n}} m", "km": "{{n}} km" }
+  "units": {
+    "m": "{{n}} m",
+    "km": "{{n}} km"
+  }
 }

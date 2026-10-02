@@ -1,9 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { io, type Socket } from "socket.io-client";
-import { useQueryClient, type QueryClient } from "@tanstack/react-query";
-import type { IncidentDTO, NotificationDTO, ServerEvents } from "@shomap/shared";
-import { qk, useMe, useMeta } from "./queries";
-import { useApp } from "./appState";
+import { useQueryClient, type QueryClient, type QueryKey } from "@tanstack/react-query";
+import type { CommentDTO, IncidentDTO, NotificationDTO, ServerEvents } from "@shomap/shared";
+import { qk, useMe } from "./queries";
+import { useApp, useToast } from "./appState";
 import { useNotificationText } from "./notificationText";
 
 let socket: Socket<ServerEvents> | null = null;
@@ -17,92 +17,90 @@ export function getSocket(): Socket<ServerEvents> {
   return socket;
 }
 
-/** After login, logout or a demo role switch the session cookie changes; reconnect to pick it up. */
-export function reconnectSocket() {
-  const s = getSocket();
-  s.disconnect();
-  s.connect();
-}
-
-function upsertIncident(qc: QueryClient, inc: IncidentDTO) {
+/** Puts a fresh incident into the map/feed list (used by socket events and mutation responses). */
+export function upsertIncident(qc: QueryClient, inc: IncidentDTO) {
   qc.setQueryData<IncidentDTO[]>(qk.incidents, (list) => {
     if (!list) return list;
-    const i = list.findIndex((x) => x.id === inc.id);
     if (inc.status === "removed") return list.filter((x) => x.id !== inc.id);
+    const i = list.findIndex((x) => x.id === inc.id);
     if (i === -1) return [inc, ...list];
     const copy = list.slice();
     copy[i] = inc;
     return copy;
   });
-  void qc.invalidateQueries({ queryKey: qk.incident(inc.id) });
 }
+
+/** Views derived from incidents; refreshed once per burst of events, not once per event. */
+const DERIVED: QueryKey[] = [["dashboard"], qk.authorityQueue, qk.adminQueue, qk.events];
 
 /** Wires Socket.IO events into the query cache. Mounted once in the app shell. */
 export function RealtimeBridge() {
   const qc = useQueryClient();
-  const { toast, setConnected } = useApp();
+  const { setConnected } = useApp();
+  const { toast } = useToast();
   const me = useMe();
-  const meta = useMeta();
   const text = useNotificationText();
 
   useEffect(() => {
     const s = getSocket();
-    const onConnect = () => {
-      setConnected(true);
-      // Catch up on anything missed while disconnected (Review Focus 3).
-      void qc.invalidateQueries();
+    let connectedBefore = false;
+    let pending = new Set<string>();
+    let timer: number | undefined;
+    const invalidateSoon = (keys: QueryKey[]) => {
+      for (const k of keys) pending.add(JSON.stringify(k));
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        for (const k of pending) void qc.invalidateQueries({ queryKey: JSON.parse(k) as QueryKey });
+        pending = new Set();
+      }, 150);
     };
-    const onDisconnect = () => setConnected(false);
-    const onIncident = (inc: IncidentDTO) => {
+
+    const handlers = {
+      connect: () => {
+        setConnected(true);
+        // A *re*connect may have missed events (Review Focus 3); the first connect hasn't.
+        if (connectedBefore) void qc.invalidateQueries();
+        connectedBefore = true;
+      },
+      disconnect: () => setConnected(false),
+      "incident:created": (inc: IncidentDTO) => onIncident(inc),
+      "incident:updated": (inc: IncidentDTO) => onIncident(inc),
+      "comment:created": (c: CommentDTO) => invalidateSoon([qk.comments(c.incidentId)]),
+      "notification:new": (n: NotificationDTO) => {
+        qc.setQueryData<NotificationDTO[]>(qk.notifications, (list) => (list ? [n, ...list] : list));
+        const tone = n.type === "sos" ? "sos" : n.type === "sos_closed" ? "success" : n.type === "status_change" && n.params.authorityId ? "official" : "info";
+        toast(text(n), tone, n.incidentId ? `/incident/${n.incidentId}` : undefined);
+      },
+      "demo:reset": () => {
+        qc.clear();
+        void qc.invalidateQueries();
+      },
+    } as const;
+    function onIncident(inc: IncidentDTO) {
       upsertIncident(qc, inc);
-      void qc.invalidateQueries({ queryKey: ["dashboard"] });
-      void qc.invalidateQueries({ queryKey: qk.authorityQueue });
-      void qc.invalidateQueries({ queryKey: qk.adminQueue });
-      void qc.invalidateQueries({ queryKey: qk.events });
-    };
-    const onComment = (c: { incidentId: string }) => void qc.invalidateQueries({ queryKey: qk.comments(c.incidentId) });
-    const onSos = ({ incident }: { incident: IncidentDTO }) => upsertIncident(qc, incident);
-    const onSosClosed = ({ incidentId }: { incidentId: string }) => {
-      void qc.invalidateQueries({ queryKey: qk.incidents });
-      void qc.invalidateQueries({ queryKey: qk.incident(incidentId) });
-    };
-    const onNotification = (n: NotificationDTO) => {
-      qc.setQueryData<NotificationDTO[]>(qk.notifications, (list) => (list ? [n, ...list] : list));
-      void qc.invalidateQueries({ queryKey: qk.notifications });
-      const tone = n.type === "sos" ? "sos" : n.type === "status_change" && n.params.authorityId ? "official" : n.type === "sos_closed" ? "success" : "info";
-      toast(text(n), tone, n.incidentId ? `/incident/${n.incidentId}` : undefined);
-    };
-    const onReset = () => {
-      qc.clear();
-      void qc.invalidateQueries();
-    };
+      // The detail view also carries the timeline, which the event doesn't, so refetch it if open.
+      invalidateSoon([qk.incident(inc.id), ...DERIVED]);
+    }
 
-    s.on("connect", onConnect);
-    s.on("disconnect", onDisconnect);
-    s.on("incident:created", onIncident);
-    s.on("incident:updated", onIncident);
-    s.on("comment:created", onComment);
-    s.on("sos:issued", onSos);
-    s.on("sos:closed", onSosClosed);
-    s.on("notification:new", onNotification);
-    s.on("demo:reset", onReset);
+    const entries = Object.entries(handlers) as [string, (...args: never[]) => void][];
+    for (const [ev, fn] of entries) s.on(ev as "connect", fn as () => void);
     return () => {
-      s.off("connect", onConnect);
-      s.off("disconnect", onDisconnect);
-      s.off("incident:created", onIncident);
-      s.off("incident:updated", onIncident);
-      s.off("comment:created", onComment);
-      s.off("sos:issued", onSos);
-      s.off("sos:closed", onSosClosed);
-      s.off("notification:new", onNotification);
-      s.off("demo:reset", onReset);
+      window.clearTimeout(timer);
+      for (const [ev, fn] of entries) s.off(ev as "connect", fn as () => void);
     };
-  }, [qc, toast, setConnected, text, meta.data]);
+  }, [qc, toast, setConnected, text]);
 
-  // Reconnect when the logged-in user changes so the server serialises for the right viewer.
-  const userId = me.data?.id ?? null;
+  // The server serialises per viewer, so reconnect when the logged-in user actually changes.
+  const userId = me.isSuccess ? me.data?.id ?? null : undefined;
+  const lastUser = useRef<string | null | undefined>(undefined);
   useEffect(() => {
-    reconnectSocket();
+    if (userId === undefined) return; // still loading
+    if (lastUser.current !== undefined && lastUser.current !== userId) {
+      const s = getSocket();
+      s.disconnect();
+      s.connect();
+    }
+    lastUser.current = userId;
   }, [userId]);
 
   return null;

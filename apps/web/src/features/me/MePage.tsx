@@ -1,8 +1,9 @@
 import { useMemo } from "react";
 import { Link, Navigate } from "react-router-dom";
+import { homeRouteFor } from "@shomap/shared";
 import { ChevronRight, MapPin } from "lucide-react";
 import { useI18n } from "../../i18n";
-import { useApp } from "../../lib/appState";
+import { useToast } from "../../lib/appState";
 import { useIncidents, useMeta, useZones } from "../../lib/queries";
 import { setGuestArea, useSession } from "../../lib/session";
 import { StatusTracker } from "../../ui/StatusTracker";
@@ -14,8 +15,8 @@ export function MePage() {
   const meta = useMeta();
   const { me, loading, updateMe, logout } = useSession();
   const incidents = useIncidents();
-  const zones = useZones(!!me && me.role === "citizen");
-  const { toast } = useApp();
+  const zones = useZones();
+  const { toast } = useToast();
 
   const mine = useMemo(() => (incidents.data ?? []).filter((i) => i.reporterIsYou), [incidents.data]);
 
@@ -34,8 +35,7 @@ export function MePage() {
         />
       </div>
     );
-  if (me.role === "authority") return <Navigate to="/authority" replace />;
-  if (me.role === "admin") return <Navigate to="/admin" replace />;
+  if (me.role !== "citizen") return <Navigate to={homeRouteFor(me.role)} replace />;
 
   return (
     <div className="page">

@@ -1,21 +1,109 @@
 {
-  "app": { "name": "ShoMap", "tagline": "জানাও। জানো। সাড়া দাও।" },
-  "nav": { "map": "ম্যাপ", "feed": "ফিড", "dashboard": "ড্যাশবোর্ড", "alerts": "অ্যালার্ট", "me": "আমি", "report": "রিপোর্ট", "authority": "রেফারেল তালিকা", "admin": "রিভিউ তালিকা", "demo": "ডেমো কন্ট্রোল", "zones": "নজর এলাকা", "myReports": "আমার রিপোর্ট" },
-  "common": {
-    "loading": "লোড হচ্ছে…", "retry": "আবার চেষ্টা করুন", "back": "পেছনে", "close": "বন্ধ করুন", "cancel": "বাতিল", "save": "সংরক্ষণ", "delete": "মুছুন",
-    "send": "পাঠান", "next": "পরের ধাপ", "done": "সম্পন্ন", "anonymous": "নাম প্রকাশে অনিচ্ছুক", "you": "আপনি", "youHidden": "আপনি · সবার কাছে নাম গোপন",
-    "optional": "ঐচ্ছিক", "demoAccount": "ডেমো অ্যাকাউন্ট", "logout": "লগ আউট", "login": "লগ ইন", "viewOnMap": "ম্যাপে দেখুন",
-    "language": "ভাষা", "moderators": "ShoMap মডারেটর", "system": "ShoMap", "copied": "লিংক কপি হয়েছে", "copyFailed": "কপি করা যায়নি। লিংকটি সিলেক্ট করে নিন।"
+  "nav": {
+    "map": "ম্যাপ",
+    "feed": "ফিড",
+    "dashboard": "ড্যাশবোর্ড",
+    "alerts": "অ্যালার্ট",
+    "me": "আমি",
+    "report": "রিপোর্ট",
+    "authority": "রেফারেল তালিকা",
+    "admin": "রিভিউ তালিকা",
+    "demo": "ডেমো কন্ট্রোল",
+    "zones": "নজর এলাকা",
+    "myReports": "আমার রিপোর্ট"
   },
-  "roles": { "citizen": "নাগরিক", "authority": "কর্তৃপক্ষ", "admin": "মডারেটর" },
-  "urgency": { "low": "কম", "medium": "মাঝারি", "high": "বেশি", "critical": "জরুরি", "label": "জরুরিতা" },
-  "verification": { "unverified": "যাচাই হয়নি", "verified": "{{count}} জন প্রতিবেশী নিশ্চিত করেছেন", "verifiedShort": "যাচাইকৃত", "disputed": "আপত্তি আছে" },
-  "status": { "open": "খোলা", "referred": "পাঠানো হয়েছে", "acknowledged": "গ্রহণ করা হয়েছে", "in_progress": "কাজ চলছে", "resolved": "সমাধান হয়েছে", "closed": "বন্ধ", "removed": "সরানো হয়েছে" },
-  "tracker": { "reported": "রিপোর্ট", "verified": "যাচাই", "referred": "পাঠানো", "resolved": "সমাধান" },
+  "common": {
+    "retry": "আবার চেষ্টা করুন",
+    "back": "পেছনে",
+    "close": "বন্ধ করুন",
+    "cancel": "বাতিল",
+    "save": "সংরক্ষণ",
+    "send": "পাঠান",
+    "next": "পরের ধাপ",
+    "anonymous": "নাম প্রকাশে অনিচ্ছুক",
+    "you": "আপনি",
+    "youHidden": "আপনি · সবার কাছে নাম গোপন",
+    "optional": "ঐচ্ছিক",
+    "demoAccount": "ডেমো অ্যাকাউন্ট",
+    "logout": "লগ আউট",
+    "login": "লগ ইন",
+    "language": "ভাষা",
+    "moderators": "ShoMap মডারেটর",
+    "system": "ShoMap",
+    "copied": "লিংক কপি হয়েছে",
+    "copyFailed": "কপি করা যায়নি। লিংকটি সিলেক্ট করে নিন।"
+  },
+  "roles": {
+    "citizen": "নাগরিক",
+    "authority": "কর্তৃপক্ষ",
+    "admin": "মডারেটর"
+  },
+  "urgency": {
+    "low": "কম",
+    "medium": "মাঝারি",
+    "high": "বেশি",
+    "critical": "জরুরি",
+    "label": "জরুরিতা"
+  },
+  "verification": {
+    "unverified": "যাচাই হয়নি",
+    "verified": "{{count}} জন প্রতিবেশী নিশ্চিত করেছেন",
+    "verifiedShort": "যাচাইকৃত",
+    "disputed": "আপত্তি আছে"
+  },
+  "status": {
+    "open": "খোলা",
+    "referred": "পাঠানো হয়েছে",
+    "acknowledged": "গ্রহণ করা হয়েছে",
+    "in_progress": "কাজ চলছে",
+    "resolved": "সমাধান হয়েছে",
+    "closed": "বন্ধ",
+    "removed": "সরানো হয়েছে"
+  },
+  "tracker": {
+    "reported": "রিপোর্ট",
+    "verified": "যাচাই",
+    "referred": "পাঠানো",
+    "resolved": "সমাধান"
+  },
   "events": {
-    "open": "রিপোর্ট করা হয়েছে", "referred": "কর্তৃপক্ষের কাছে পাঠানো হয়েছে", "acknowledged": "গ্রহণ করা হয়েছে", "in_progress": "কাজ শুরু হয়েছে", "resolved": "সমাধান হয়েছে",
-    "closed": "বন্ধ করা হয়েছে", "removed": "সরানো হয়েছে", "verified": "যাচাই হয়েছে", "disputed": "আপত্তি উঠেছে", "unverified": "আবার যাচাইহীন",
-    "sos_found": "নিরাপদে পাওয়া গেছে", "sos_cancelled": "অ্যালার্ট তুলে নেওয়া হয়েছে", "sos_expired": "অ্যালার্টের মেয়াদ শেষ", "sos_approved": "মডারেটর অ্যালার্টটি দেখেছেন"
+    "reported": "রিপোর্ট করা হয়েছে",
+    "status": {
+      "open": "পুনরায় দায়িত্ব দেওয়ার জন্য ফেরত",
+      "referred": "কর্তৃপক্ষের কাছে পাঠানো হয়েছে",
+      "acknowledged": "গ্রহণ করা হয়েছে",
+      "in_progress": "কাজ শুরু হয়েছে",
+      "resolved": "সমাধান হয়েছে",
+      "closed": "বন্ধ করা হয়েছে",
+      "removed": "সরানো হয়েছে"
+    },
+    "verification": {
+      "verified": "যাচাই হয়েছে",
+      "disputed": "আপত্তি উঠেছে",
+      "unverified": "আবার যাচাইহীন"
+    },
+    "sos": {
+      "found": "নিরাপদে পাওয়া গেছে",
+      "cancelled": "অ্যালার্ট তুলে নেওয়া হয়েছে",
+      "expired": "অ্যালার্টের মেয়াদ শেষ",
+      "reviewed": "মডারেটর অ্যালার্টটি দেখেছেন"
+    }
+  },
+  "eventNotes": {
+    "referredAuto": "প্রতিবেশীরা নিশ্চিত করেছেন। স্বয়ংক্রিয়ভাবে পাঠানো হয়েছে।",
+    "referredCritical": "জরুরি রিপোর্ট। সাথে সাথে পাঠানো হয়েছে।",
+    "referredAdmin": "ShoMap মডারেটররা পাঠিয়েছেন।",
+    "confirmedBy": "{{count}} জন প্রতিবেশী নিশ্চিত করেছেন।",
+    "disputedBy": "{{count}} জন প্রতিবেশী আপত্তি জানিয়েছেন।",
+    "reopened": "আবার খোলা হয়েছে: {{count}} জন প্রতিবেশী বলছেন এটি এখনো ঘটছে।",
+    "autoClosed": "{{hours}} ঘণ্টায় কোনো আপত্তি না আসায় বন্ধ করা হয়েছে।",
+    "sosExpired": "{{hours}} ঘণ্টা পর অ্যালার্টের মেয়াদ শেষ হয়েছে।",
+    "unverifiedExpired": "{{days}} দিনে নিশ্চিত না হওয়ায় মেয়াদ শেষ।",
+    "verifiedByModerators": "মডারেটররা যাচাই করেছেন।",
+    "sosFound": "নিরাপদে পাওয়া গেছে।",
+    "sosCancelled": "রিপোর্টকারী বাতিল করেছেন।",
+    "sosWithdrawn": "মডারেটররা তুলে নিয়েছেন।",
+    "sosReviewed": "মডারেটররা দেখেছেন।"
   },
   "map": {
     "headline": "এই সপ্তাহে {{area}}-এ প্রতিবেশীরা {{count}}টি ঘটনা জানিয়েছেন।",
@@ -29,12 +117,22 @@
     "listTitle": "কাছাকাছি রিপোর্ট",
     "showList": "তালিকা দেখুন",
     "hideList": "তালিকা লুকান",
-    "cluster": "এখানে {{count}}টি রিপোর্ট। জুম করুন।",
-    "areaLabel": "এলাকা: {{area}}"
+    "cluster": "এখানে {{count}}টি রিপোর্ট। জুম করুন।"
   },
   "filters": {
-    "title": "ফিল্টার", "category": "ধরন", "urgency": "জরুরিতা", "verification": "আস্থা", "status": "অবস্থা", "time": "সময়",
-    "all": "সব", "active": "চলমান", "resolved": "সমাধান", "h24": "২৪ ঘণ্টা", "d7": "৭ দিন", "d14": "১৪ দিন", "clear": "ফিল্টার মুছুন",
+    "title": "ফিল্টার",
+    "category": "ধরন",
+    "urgency": "জরুরিতা",
+    "verification": "আস্থা",
+    "status": "অবস্থা",
+    "time": "সময়",
+    "all": "সব",
+    "active": "চলমান",
+    "resolved": "সমাধান",
+    "h24": "২৪ ঘণ্টা",
+    "d7": "৭ দিন",
+    "d14": "১৪ দিন",
+    "clear": "ফিল্টার মুছুন",
     "showing": "{{count}}টি দেখানো হচ্ছে"
   },
   "report": {
@@ -125,14 +223,10 @@
     "flagged": "ধন্যবাদ। মডারেটররা দেখবেন।",
     "notFound": "এই রিপোর্টটি খোলা যায়নি। হয়তো সরিয়ে ফেলা হয়েছে।",
     "backToMap": "ম্যাপে ফিরে যান",
-    "reportedBy": "জানিয়েছেন {{name}}",
     "anonymousToPublic": "সবার কাছে নাম গোপন",
-    "happened": "ঘটেছে {{time}}",
     "reply": "উত্তর",
     "replyingTo": "উত্তর দিচ্ছেন",
-    "official": "দাপ্তরিক",
     "share": "লিংক কপি",
-    "photosHidden": "ছবি লুকানো",
     "markFound": "আমার সন্তানকে পাওয়া গেছে",
     "cancelAlert": "অ্যালার্ট বাতিল করুন",
     "demoConfirm": "ডেমো: একজন প্রতিবেশীর নিশ্চিতকরণ যোগ করুন",
@@ -142,8 +236,19 @@
     "factAuthority": "দায়িত্বে",
     "close": "বিস্তারিত বন্ধ করুন"
   },
-  "commentKind": { "comment": "মন্তব্য", "update": "আপডেট", "sighting": "দেখা গেছে", "offer_help": "সাহায্যের প্রস্তাব", "official": "দাপ্তরিক আপডেট" },
-  "flagReason": { "false": "এটি মিথ্যা", "offensive": "আপত্তিকর", "personal_info": "ব্যক্তিগত তথ্য আছে", "spam": "স্প্যাম" },
+  "commentKind": {
+    "comment": "মন্তব্য",
+    "update": "আপডেট",
+    "sighting": "দেখা গেছে",
+    "offer_help": "সাহায্যের প্রস্তাব",
+    "official": "দাপ্তরিক আপডেট"
+  },
+  "flagReason": {
+    "false": "এটি মিথ্যা",
+    "offensive": "আপত্তিকর",
+    "personal_info": "ব্যক্তিগত তথ্য আছে",
+    "spam": "স্প্যাম"
+  },
   "sos": {
     "banner": "জরুরি · নিখোঁজ শিশু",
     "age": "{{age}} বছর",
@@ -156,7 +261,6 @@
     "sightingSent": "ধন্যবাদ। পরিবারকে জানানো হয়েছে।",
     "share": "লিংক কপি",
     "collapse": "ছোট করুন",
-    "expand": "অ্যালার্ট দেখুন",
     "found": "নিরাপদে পাওয়া গেছে। ধন্যবাদ, {{area}}।",
     "cancelled": "মডারেটররা এই অ্যালার্টটি তুলে নিয়েছেন।",
     "expired": "৭২ ঘণ্টা পর এই অ্যালার্টের মেয়াদ শেষ হয়েছে।",
@@ -224,7 +328,6 @@
     "reopened_authority": "{{count}} জন প্রতিবেশী আবার খুলেছেন: {{area}}-এর {{category}}"
   },
   "me": {
-    "title": "আমি",
     "homeArea": "বাসার এলাকা",
     "chooseArea": "এলাকা বেছে নিন",
     "myReports": "আমার রিপোর্ট",
@@ -242,7 +345,6 @@
     "labelPlaceholder": "বাসা, অফিস, সন্তানের স্কুল",
     "radius": "ব্যাসার্ধ",
     "minUrgency": "জানাবে",
-    "minUrgencyHelp": "এই মাত্রা ও তার বেশি",
     "tapMap": "কেন্দ্র ঠিক করতে ম্যাপে চাপ দিন।",
     "empty": "পছন্দের জায়গাগুলো অনুসরণ করুন: বাসা, অফিস, সন্তানের স্কুল।",
     "saved": "এখন নজর রাখা হচ্ছে: {{label}}",
@@ -298,7 +400,12 @@
   },
   "admin": {
     "title": "রিভিউ তালিকা",
-    "tabs": { "sos_review": "জরুরি অ্যালার্ট রিভিউ", "disputed": "আপত্তি আছে", "flagged": "অভিযোগ", "redirected": "ফেরত আসা" },
+    "tabs": {
+      "sos_review": "জরুরি অ্যালার্ট রিভিউ",
+      "disputed": "আপত্তি আছে",
+      "flagged": "অভিযোগ",
+      "redirected": "ফেরত আসা"
+    },
     "empty": "রিভিউ করার কিছু নেই 🎉",
     "verify": "যাচাই করুন",
     "remove": "সরান",
@@ -360,5 +467,8 @@
     "network": "ShoMap-এর সাথে সংযোগ নেই। হটস্পট দেখে আবার চেষ্টা করুন।"
   },
   "reconnecting": "আবার সংযোগ হচ্ছে…",
-  "units": { "m": "{{n}} মি", "km": "{{n}} কিমি" }
+  "units": {
+    "m": "{{n}} মি",
+    "km": "{{n}} কিমি"
+  }
 }

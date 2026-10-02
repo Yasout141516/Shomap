@@ -20,8 +20,8 @@ const row: IncidentRow = {
   confirmCount: 3,
   disputeCount: 0,
   stillCount: 0,
-  reviewReason: null,
-  reviewNote: null,
+  redirected: false,
+  redirectNote: null,
   idempotencyKey: null,
   occurredAt: T,
   createdAt: T,
@@ -50,6 +50,7 @@ const bundle = (over: Partial<IncidentBundle> = {}): IncidentBundle => ({
   commentCount: 0,
   myVote: null,
   myStill: false,
+  alertedYou: false,
   ...over,
 });
 

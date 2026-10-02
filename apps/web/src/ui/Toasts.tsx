@@ -1,10 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
-import { useApp } from "../lib/appState";
+import { useToast } from "../lib/appState";
 import { useI18n } from "../i18n";
 
 export function Toasts() {
-  const { toasts, dismissToast } = useApp();
+  const { toasts, dismissToast } = useToast();
   const nav = useNavigate();
   const { t } = useI18n();
   return (

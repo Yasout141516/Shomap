@@ -1,20 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Outlet, useMatch, useNavigate } from "react-router-dom";
 import type { Map as MlMap } from "maplibre-gl";
-import { URGENCY_ORDER } from "@shomap/shared";
 import { useI18n } from "../../i18n";
 import { useApp } from "../../lib/appState";
-import { useIncidents, useMeta, useZones } from "../../lib/queries";
-import { useHomeAreaId, useSession } from "../../lib/session";
-import { circlePolygon } from "../../lib/geo";
+import { useDashboard, useIncidents, useMeta, useZones } from "../../lib/queries";
+import { useHomeArea, useHomeAreaId } from "../../lib/session";
+import { circlePolygon, inBounds } from "../../lib/geo";
 import { EmptyState, ErrorState, Skeleton } from "../../ui/states";
 import { IncidentCard, useIncidentLabel } from "../incident/IncidentCard";
 import { BaseMap } from "./BaseMap";
 import { FilterBar } from "./FilterBar";
 import { applyFilters, byUrgencyThenRecent } from "./filters";
 import { AreaLabels, PinLayer, setCircleLayer } from "./PinLayer";
-
-const WEEK = 7 * 24 * 3_600_000;
 
 export function MapPage() {
   const { t, name } = useI18n();
@@ -23,9 +20,11 @@ export function MapPage() {
   const selectedId = match?.params.id ?? null;
   const meta = useMeta();
   const incidents = useIncidents();
-  const { me } = useSession();
-  const zones = useZones(!!me && me.role === "citizen");
+  const zones = useZones();
   const homeAreaId = useHomeAreaId();
+  const home = useHomeArea();
+  // Same numbers as the dashboard (one definition of "this week").
+  const week = useDashboard(homeAreaId ? "home" : "all", homeAreaId ?? undefined).data?.totals;
   const { filters, openReport, focusRequest } = useApp();
   const labelFor = useIncidentLabel();
 
@@ -36,24 +35,12 @@ export function MapPage() {
   const pins = useRef<PinLayer | null>(null);
   const labels = useRef<AreaLabels | null>(null);
 
-  const home = meta.data?.areas.find((a) => a.id === homeAreaId) ?? meta.data?.areas.find((a) => a.id === "farmgate");
   const filtered = useMemo(() => applyFilters(incidents.data ?? [], filters), [incidents.data, filters]);
   const inView = useMemo(() => {
-    if (!bounds) return filtered;
-    const [w, s, e, n] = bounds;
-    return filtered.filter((i) => i.lng >= w && i.lng <= e && i.lat >= s && i.lat <= n);
+    return bounds ? filtered.filter((i) => inBounds(i, bounds)) : filtered;
   }, [filtered, bounds]);
   const list = useMemo(() => [...inView].sort(byUrgencyThenRecent), [inView]);
 
-  const weekStats = useMemo(() => {
-    const since = Date.now() - WEEK;
-    const inHome = (incidents.data ?? []).filter((i) => (!home || i.areaId === home.id) && Date.parse(i.createdAt) >= since);
-    return {
-      reported: inHome.length,
-      high: inHome.filter((i) => URGENCY_ORDER[i.urgency] >= URGENCY_ORDER.high).length,
-      resolved: inHome.filter((i) => i.status === "resolved" || i.status === "closed").length,
-    };
-  }, [incidents.data, home]);
 
   // Pins + area labels, created once the map has loaded.
   useEffect(() => {
@@ -69,9 +56,7 @@ export function MapPage() {
     else pins.current.setOptions(opts);
     labels.current ??= new AreaLabels(map);
     labels.current.set(meta.data.areas.map((a) => ({ id: a.id, lat: a.lat, lng: a.lng, label: name(a) })));
-    // labelFor/t/name change with language; that's what should rebuild labels.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map, meta.data, t]);
+  }, [map, meta.data, labelFor, t, name, nav]);
 
   useEffect(() => () => {
     pins.current?.destroy();
@@ -82,7 +67,7 @@ export function MapPage() {
 
   useEffect(() => {
     if (map && pins.current) pins.current.setData(filtered);
-  }, [map, filtered, meta.data, t]);
+  }, [map, filtered, meta.data]);
 
   useEffect(() => pins.current?.setSelected(selectedId), [selectedId, map, filtered]);
 
@@ -127,7 +112,7 @@ export function MapPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map, selectedId, !!selected]);
 
-  const areaName = home ? name(home) : t("dashboard.scopeAll");
+  const areaName = homeAreaId && home ? name(home) : t("dashboard.scopeAll");
 
   return (
     <div className={`map-page${selectedId ? " has-panel" : ""}`}>
@@ -137,7 +122,7 @@ export function MapPage() {
           {sheetOpen ? t("map.hideList") : t("map.showList")}
         </button>
         <div className="list-head">
-          <p className="headline">{home ? t("map.headline", { count: weekStats.reported, area: areaName }) : t("map.headlineAll", { count: weekStats.reported })}</p>
+          <p className="headline">{t(homeAreaId ? "map.headline" : "map.headlineAll", { count: week?.reported ?? 0, area: areaName })}</p>
           <FilterBar count={filtered.length} />
         </div>
         <div className="list-body">
@@ -170,9 +155,11 @@ export function MapPage() {
       <section className="map-wrap">
         {home ? <BaseMap center={home} zoom={14} onReady={setMap} onTilesMissing={() => setTilesMissing(true)} ariaLabel={t("nav.map")} /> : <Skeleton rows={1} height={400} />}
         {tilesMissing ? <div className="map-note">{t("map.tilesUnavailable")}</div> : null}
-        <div className="counts-strip" aria-live="polite">
-          {t("map.counts", { reported: weekStats.reported, high: weekStats.high, resolved: weekStats.resolved })}
-        </div>
+        {week ? (
+          <div className="counts-strip" aria-live="polite">
+            {t("map.counts", { reported: week.reported, high: week.highPlus, resolved: week.resolved })}
+          </div>
+        ) : null}
       </section>
 
       <Outlet />

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Bell, ChevronDown, LayoutDashboard, LogIn, Map as MapIcon, Plus, Rss, User } from "lucide-react";
+import { homeRouteFor } from "@shomap/shared";
 import { useI18n } from "../../i18n";
 import { useApp } from "../../lib/appState";
 import { useMeta, useNotifications } from "../../lib/queries";
@@ -91,7 +92,7 @@ export function Shell() {
   const { openReport, reportOpen, connected } = useApp();
   const { me } = useSession();
   const loc = useLocation();
-  const staffHome = me?.role === "authority" ? "/authority" : me?.role === "admin" ? "/admin" : null;
+  const staffHome = me && me.role !== "citizen" ? homeRouteFor(me.role) : null;
   const showFab = !reportOpen && (loc.pathname === "/" || loc.pathname.startsWith("/incident") || loc.pathname === "/feed" || loc.pathname === "/dashboard");
 
   return (

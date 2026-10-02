@@ -12,6 +12,8 @@ export interface IncidentBundle {
   commentCount: number;
   myVote: "confirm" | "dispute" | null;
   myStill: boolean;
+  /** This viewer was sent the SOS alert. */
+  alertedYou: boolean;
 }
 
 /** Admins and staff of the assigned authority are privileged for every incident. */
@@ -80,7 +82,8 @@ export function serializeIncident(b: IncidentBundle, viewer: Viewer): IncidentDT
           childAge: sos.childAge,
           clothing: sos.clothing,
           lastSeenAt: sos.lastSeenAt,
-          pendingReview: row.reviewReason === "sos_review",
+          pendingReview: sos.state === "active" && sos.reviewedAt === null,
+          alertedYou: b.alertedYou,
         }
       : null,
     myVote: b.myVote,

@@ -3,7 +3,7 @@ import type { FastifyInstance } from "fastify";
 import { and, eq, ne } from "drizzle-orm";
 import QRCode from "qrcode";
 import { z } from "zod";
-import { AdminActionInput, ReferralActionInput, type DemoInfoDTO } from "@shomap/shared";
+import { AdminActionInput, ReferralActionInput, SwitchRoleInput, type DemoInfoDTO } from "@shomap/shared";
 import * as s from "../db/schema.js";
 import { requireRole, requireUser, setSession, toViewer } from "../auth.js";
 import { HttpError, notFound } from "../errors.js";
@@ -12,7 +12,7 @@ import { incidentDTO } from "../services/repo.js";
 import { adminQueue, authorityQueue, eventLog } from "../services/queries.js";
 import { adminIncidentAction, hideComment, referralAction, sweep } from "../services/actions.js";
 import { vote } from "../services/reports.js";
-import { seed } from "../db/seed.js";
+import { DEMO_HEROES, seed } from "../db/seed.js";
 import { Effects } from "../realtime.js";
 import { meDTO } from "./public.js";
 
@@ -34,11 +34,10 @@ export function staffRoutes(app: FastifyInstance, ctx: Ctx) {
   });
 
   app.post("/api/referrals/:id/actions", async (req) => {
-    const user = requireRole(req, db, ["authority"]);
+    const user = requireUser(req, db);
     const { id } = req.params as { id: string };
-    const ref = db.select().from(s.referrals).where(eq(s.referrals.id, id)).get();
     const result = await referralAction(ctx, user, id, ReferralActionInput.parse(req.body));
-    return { ...result, incident: ref ? incidentDTO(db, ref.incidentId, toViewer(user)) : null };
+    return { ...result, incident: incidentDTO(db, result.incidentId, toViewer(user)) };
   });
 
   // ---- Admin (FR-12)
@@ -48,14 +47,14 @@ export function staffRoutes(app: FastifyInstance, ctx: Ctx) {
   });
 
   app.post("/api/admin/incidents/:id/actions", async (req) => {
-    const user = requireRole(req, db, ["admin"]);
+    const user = requireUser(req, db);
     const { id } = req.params as { id: string };
     await adminIncidentAction(ctx, user, id, AdminActionInput.parse(req.body));
     return { incident: incidentDTO(db, id, toViewer(user)) };
   });
 
   app.post("/api/admin/comments/:id/hide", async (req) => {
-    const user = requireRole(req, db, ["admin"]);
+    const user = requireUser(req, db);
     const { id } = req.params as { id: string };
     return hideComment(ctx, user, id);
   });
@@ -77,7 +76,7 @@ export function staffRoutes(app: FastifyInstance, ctx: Ctx) {
       .select()
       .from(s.users)
       .all()
-      .map((u) => ({ id: u.id, displayName: u.displayName, role: u.role, homeAreaId: u.homeAreaId, authorityId: u.authorityId }));
+      .map((u) => ({ id: u.id, displayName: u.displayName, role: u.role, homeAreaId: u.homeAreaId, authorityId: u.authorityId, hero: DEMO_HEROES[u.id] ?? null }));
     return {
       lanUrls: urls,
       qrSvg: urls[0] ? await QRCode.toString(urls[0], { type: "svg", margin: 1 }) : null,
@@ -88,7 +87,7 @@ export function staffRoutes(app: FastifyInstance, ctx: Ctx) {
 
   app.post("/api/demo/switch-role", async (req, reply) => {
     demoOnly();
-    const { userId } = z.object({ userId: z.string() }).parse(req.body);
+    const { userId } = SwitchRoleInput.parse(req.body);
     const user = db.select().from(s.users).where(eq(s.users.id, userId)).get();
     if (!user) throw notFound();
     setSession(reply, user.id);
