@@ -1,7 +1,8 @@
 import { ACTIVE_STATUSES, DAY_MS, URGENCY_ORDER, type IncidentDTO } from "@shomap/shared";
 import type { Filters } from "../../lib/appState";
+import { serverNow } from "../../lib/clock";
 
-export function applyFilters(list: IncidentDTO[], f: Filters, nowMs = Date.now()): IncidentDTO[] {
+export function applyFilters(list: IncidentDTO[], f: Filters, nowMs = serverNow()): IncidentDTO[] {
   const since = nowMs - f.days * DAY_MS;
   return list.filter((i) => {
     const sosActive = i.sos?.state === "active";

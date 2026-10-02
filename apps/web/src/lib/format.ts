@@ -1,4 +1,5 @@
 import { DHAKA_OFFSET_MS, type Lang } from "@shomap/shared";
+import { serverNow } from "./clock";
 
 const rtf: Record<Lang, Intl.RelativeTimeFormat> = {
   en: new Intl.RelativeTimeFormat("en", { numeric: "auto" }),
@@ -6,7 +7,7 @@ const rtf: Record<Lang, Intl.RelativeTimeFormat> = {
 };
 
 /** "5 minutes ago" / "৫ মিনিট আগে". */
-export function relTime(iso: string, lang: Lang, nowMs = Date.now()): string {
+export function relTime(iso: string, lang: Lang, nowMs = serverNow()): string {
   const diffS = Math.round((Date.parse(iso) - nowMs) / 1000);
   const abs = Math.abs(diffS);
   if (abs < 45) return rtf[lang].format(0, "second");
@@ -16,7 +17,7 @@ export function relTime(iso: string, lang: Lang, nowMs = Date.now()): string {
 }
 
 /** "42 min" style duration for authority timers. */
-export function duration(fromIso: string, lang: Lang, nowMs = Date.now()): string {
+export function duration(fromIso: string, lang: Lang, nowMs = serverNow()): string {
   const mins = Math.max(0, Math.round((nowMs - Date.parse(fromIso)) / 60000));
   const nf = new Intl.NumberFormat(lang === "bn" ? "bn-BD" : "en-US");
   if (mins < 60) return lang === "bn" ? `${nf.format(mins)} মিনিট` : `${nf.format(mins)} min`;
@@ -47,8 +48,10 @@ export function toLocalInput(d: Date): string {
   const dhaka = new Date(d.getTime() + DHAKA_OFFSET_MS);
   return dhaka.toISOString().slice(0, 16);
 }
-export function fromLocalInput(v: string): string {
-  return new Date(Date.parse(`${v}:00Z`) - DHAKA_OFFSET_MS).toISOString();
+/** ISO string for a datetime-local value, or null when the input is empty or invalid. */
+export function fromLocalInput(v: string): string | null {
+  const ms = Date.parse(`${v}:00Z`);
+  return Number.isNaN(ms) ? null : new Date(ms - DHAKA_OFFSET_MS).toISOString();
 }
 
 /** "You" / "You · hidden from public" / the name / "Anonymous" for a reporter or commenter. */

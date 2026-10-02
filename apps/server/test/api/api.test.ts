@@ -99,6 +99,13 @@ describe("reporting", () => {
     expect(b.json().id).toBe(a.json().id);
   });
 
+  it("rejects another user's idempotency key instead of failing", async () => {
+    const a = await report(await loginAs("u-rahim"), { idempotencyKey: "shared-key-123" });
+    expect(a.statusCode).toBe(201);
+    const b = await report(await loginAs("u-nila"), { idempotencyKey: "shared-key-123" });
+    expect(b.statusCode).toBe(400);
+  });
+
   it("rate-limits the 6th report in an hour", async () => {
     const c = await loginAs("u-nusrat");
     for (let i = 0; i < 5; i++) expect((await report(c, {})).statusCode).toBe(201);
@@ -239,9 +246,32 @@ describe("SOS", () => {
     const after = (await app.inject({ method: "GET", url: `/api/incidents/${inc.id}`, headers: { cookie: arif } })).json().incident;
     expect(after.sos.state).toBe("found");
     expect(after.media).toHaveLength(0); // photo hidden from the public
+    // ...and its old URL no longer serves the file to the public, only to the family.
+    const photoUrl: string = inc.media[0].url;
+    expect((await app.inject({ method: "GET", url: photoUrl, headers: { cookie: arif } })).statusCode).toBe(404);
+    expect((await app.inject({ method: "GET", url: photoUrl })).statusCode).toBe(404);
+    const own = await app.inject({ method: "GET", url: photoUrl, headers: { cookie: shirin } });
+    expect(own.statusCode).toBe(200);
+    expect(own.headers["content-type"]).toContain("image/jpeg");
     const found = (await app.inject({ method: "GET", url: "/api/notifications", headers: { cookie: arif } })).json().notifications;
     expect(found[0].titleKey).toBe("notifications.sos_found");
     expect((await app.inject({ method: "GET", url: "/api/sos/active" })).json().incidents).toHaveLength(0);
+  });
+});
+
+describe("verification timeline notes", () => {
+  it("records a cleared dispute as cleared, not as disputed", async () => {
+    const id = (await report(await loginAs("u-rahim"), {})).json().id;
+    for (const u of ["u-nila", "u-tanvir", "u-rafiq"]) {
+      await app.inject({ method: "POST", url: `/api/incidents/${id}/votes`, payload: { vote: "dispute" }, headers: { cookie: await loginAs(u) } });
+    }
+    for (const u of ["u-habib", "u-kamal", "u-mitu"]) await confirm(await loginAs(u), id);
+    const inc = (await app.inject({ method: "GET", url: `/api/incidents/${id}` })).json().incident;
+    const trust = inc.events.filter((e: { kind: string }) => e.kind === "verification");
+    expect(trust.map((e: { toStatus: string; noteKey: string }) => [e.toStatus, e.noteKey])).toEqual([
+      ["disputed", "disputedBy"],
+      ["unverified", "disputeCleared"],
+    ]);
   });
 });
 
@@ -257,5 +287,8 @@ describe("admin", () => {
     expect(ok.statusCode).toBe(200);
     const guest = await app.inject({ method: "GET", url: `/api/incidents/${disputed.incident.id}` });
     expect(guest.statusCode).toBe(404);
+    // The thread goes with it.
+    expect((await app.inject({ method: "GET", url: `/api/incidents/${disputed.incident.id}/comments` })).statusCode).toBe(404);
+    expect((await app.inject({ method: "GET", url: `/api/incidents/${disputed.incident.id}/comments`, headers: { cookie: admin } })).statusCode).toBe(200);
   });
 });

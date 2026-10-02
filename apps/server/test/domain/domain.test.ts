@@ -74,6 +74,7 @@ describe("canTransition", () => {
     ["resolved", "in_progress", "community"],
     ["referred", "removed", "admin"],
     ["in_progress", "removed", "admin"],
+    ["closed", "removed", "admin"],
   ];
   it.each(legal)("%s → %s by %s is allowed", (from, to, actor) => {
     expect(canTransition(from, to, actor)).toBe(true);

@@ -14,6 +14,7 @@ import type {
   WatchZoneDTO,
 } from "@shomap/shared";
 import { api } from "./api";
+import { setServerClockOffset } from "./clock";
 
 export const qk = {
   meta: ["meta"] as const,
@@ -30,7 +31,16 @@ export const qk = {
   demo: ["demo-info"] as const,
 };
 
-export const useMeta = () => useQuery({ queryKey: qk.meta, queryFn: () => api<MetaDTO>("/api/meta"), staleTime: Infinity });
+export const useMeta = () =>
+  useQuery({
+    queryKey: qk.meta,
+    queryFn: async () => {
+      const meta = await api<MetaDTO>("/api/meta");
+      setServerClockOffset(meta.clockOffsetMs);
+      return meta;
+    },
+    staleTime: Infinity,
+  });
 
 export const useMe = () =>
   useQuery({ queryKey: qk.me, queryFn: async () => (await api<{ me: MeDTO | null }>("/api/me")).me, staleTime: 60_000 });

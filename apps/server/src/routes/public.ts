@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import path from "node:path";
 import type { FastifyInstance } from "fastify";
 import { and, asc, desc, eq } from "drizzle-orm";
@@ -18,9 +19,10 @@ import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import * as s from "../db/schema.js";
 import { clearSession, currentUser, requireUser, setSession, toViewer } from "../auth.js";
+import { isPrivileged } from "../serializers/incident.js";
 import { HttpError, badRequest, notFound } from "../errors.js";
 import type { Ctx } from "../services/context.js";
-import { commentDTOs, getIncidentRow, incidentDTO, incidentDTOs, statusEvents } from "../services/repo.js";
+import { commentDTOs, getIncidentRow, incidentDTO, incidentDTOs, referralOf, statusEvents } from "../services/repo.js";
 import { addComment, flag, stillHappening, submitReport, vote } from "../services/reports.js";
 import { activeSos, dashboard, listIncidents } from "../services/queries.js";
 import { closeSosByUser } from "../services/actions.js";
@@ -51,6 +53,24 @@ export function publicRoutes(app: FastifyInstance, ctx: Ctx) {
   const { db } = ctx;
   const uploadsDir = path.join(ctx.cfg.dataDir, "uploads");
 
+  // ---- Photos. A hidden photo (e.g. an SOS child photo after "found") is only served to the
+  // people who may still see it, so the old URL stops working for everyone else (FR-8.5).
+  app.get("/uploads/:name", async (req, reply) => {
+    const { name } = req.params as { name: string };
+    if (!/^[\w-]+\.jpg$/.test(name)) throw notFound();
+    const media = db.select().from(s.incidentMedia).where(eq(s.incidentMedia.url, `/uploads/${name}`)).get();
+    if (!media) throw notFound();
+    if (media.publicHidden) {
+      const viewer = toViewer(currentUser(req, db));
+      const inc = getIncidentRow(db, media.incidentId);
+      const allowed = !!inc && (viewer?.id === inc.reporterId || isPrivileged(viewer, referralOf(db, inc.id)));
+      if (!allowed) throw notFound();
+    }
+    const file = path.join(uploadsDir, name);
+    if (!fs.existsSync(file)) throw notFound();
+    return reply.type("image/jpeg").header("cache-control", "private, no-cache").send(fs.createReadStream(file));
+  });
+
   // ---- Reference data
   app.get("/api/meta", async (): Promise<MetaDTO> => ({
     areas: db.select().from(s.areas).all(),
@@ -62,6 +82,7 @@ export function publicRoutes(app: FastifyInstance, ctx: Ctx) {
       .map(({ sort: _s, ...c }) => c),
     authorities: db.select().from(s.authorities).all(),
     demoMode: ctx.cfg.demoMode,
+    clockOffsetMs: ctx.clock.nowMs() - Date.now(),
     config: {
       confirmThreshold: ctx.cfg.confirmThreshold,
       reopenThreshold: ctx.cfg.reopenThreshold,
@@ -165,8 +186,10 @@ export function publicRoutes(app: FastifyInstance, ctx: Ctx) {
 
   app.get("/api/incidents/:id/comments", async (req) => {
     const { id } = req.params as { id: string };
-    if (!getIncidentRow(db, id)) throw notFound();
-    return { comments: commentDTOs(db, id, toViewer(currentUser(req, db))) };
+    const viewer = toViewer(currentUser(req, db));
+    const row = getIncidentRow(db, id);
+    if (!row || (row.status === "removed" && viewer?.role !== "admin")) throw notFound();
+    return { comments: commentDTOs(db, id, viewer) };
   });
 
   app.post("/api/incidents/:id/comments", async (req, reply) => {

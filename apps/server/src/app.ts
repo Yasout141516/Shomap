@@ -38,9 +38,8 @@ export async function buildApp(opts: BuildOptions): Promise<{ app: FastifyInstan
   publicRoutes(app, ctx);
   staffRoutes(app, ctx);
 
-  const uploads = path.join(cfg.dataDir, "uploads");
-  fs.mkdirSync(uploads, { recursive: true });
-  await app.register(fastifyStatic, { root: uploads, prefix: "/uploads/", decorateReply: false });
+  // Uploaded photos are served by an access-checked route in routes/public.ts, not statically.
+  fs.mkdirSync(path.join(cfg.dataDir, "uploads"), { recursive: true });
   if (fs.existsSync(cfg.offlineDir)) {
     // PMTiles are read with HTTP Range requests, which @fastify/static supports.
     await app.register(fastifyStatic, { root: cfg.offlineDir, prefix: "/offline/", decorateReply: false });

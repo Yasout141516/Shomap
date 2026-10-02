@@ -20,6 +20,7 @@ const EDGES: Record<Edge, Actor[]> = {
   "resolved>closed": ["system"],
   "resolved>in_progress": ["community"],
   "resolved>removed": ["admin"],
+  "closed>removed": ["admin"],
 } as Record<Edge, Actor[]>;
 
 export function canTransition(from: Status, to: Status, actor: Actor): boolean {

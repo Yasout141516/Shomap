@@ -50,6 +50,11 @@ export class Realtime {
     });
   }
 
+  /** A payload-less event for every client (e.g. the demo clock moved). */
+  broadcast(event: "demo:clock") {
+    this.io?.emit(event);
+  }
+
   /**
    * Serialises each change once per distinct viewer (anonymity rules apply to real-time payloads
    * exactly as to REST, spec §4) and emits it to that viewer's room.

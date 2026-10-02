@@ -6,6 +6,7 @@ import { useI18n } from "../../i18n";
 import { api } from "../../lib/api";
 import { useAction } from "../../lib/actions";
 import { duration } from "../../lib/format";
+import { serverNow } from "../../lib/clock";
 import { useLookup } from "../../lib/lookup";
 import { qk, useAuthorityQueue } from "../../lib/queries";
 import { useSession } from "../../lib/session";
@@ -88,7 +89,7 @@ export function AuthorityPage() {
             </thead>
             <tbody>
               {q.data.map((inc) => {
-                const stale = inc.status === "referred" && Date.now() - Date.parse(inc.referral!.referredAt) > STALE_MS;
+                const stale = inc.status === "referred" && serverNow() - Date.parse(inc.referral!.referredAt) > STALE_MS;
                 return (
                   <tr key={inc.id} className={`${inc.status === "resolved" ? "is-done" : ""}${inc.sos?.state === "active" ? " is-sos" : ""}`}>
                     <td>

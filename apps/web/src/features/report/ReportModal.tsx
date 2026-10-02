@@ -269,7 +269,8 @@ export function ReportModal() {
   const sosOk =
     !isSos ||
     (okPhotos.length > 0 &&
-      SosDetailsInput.safeParse({ childName: child.name, childAge: Number(child.age), clothing: child.clothing, lastSeenAt: fromLocalInput(child.lastSeen) }).success && child.age !== "");
+      child.age !== "" &&
+      SosDetailsInput.safeParse({ childName: child.name, childAge: Number(child.age), clothing: child.clothing, lastSeenAt: fromLocalInput(child.lastSeen) }).success);
   const canSubmit = descOk && sosOk && !outside && phase !== "sending" && phase !== "retrying";
 
   const submit = async () => {
@@ -281,11 +282,11 @@ export function ReportModal() {
       lng: point.lng,
       description: description.trim(),
       urgency: isSos ? undefined : urgency,
-      occurredAt: fromLocalInput(when),
+      occurredAt: fromLocalInput(when) ?? undefined, // empty → server uses "now"
       isAnonymous: isSos ? false : anonymous,
       addressText: landmark.trim() || undefined,
       idempotencyKey: key,
-      sos: isSos ? { childName: child.name.trim(), childAge: Number(child.age), clothing: child.clothing.trim(), lastSeenAt: fromLocalInput(child.lastSeen) } : undefined,
+      sos: isSos ? { childName: child.name.trim(), childAge: Number(child.age), clothing: child.clothing.trim(), lastSeenAt: fromLocalInput(child.lastSeen)! } : undefined,
     };
     const form = () => {
       const fd = new FormData();

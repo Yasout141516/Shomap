@@ -68,19 +68,32 @@ function precheck(ctx: Ctx, user: s.UserRow, input: ReportInput, photoCount: num
 export async function submitReport(ctx: Ctx, user: s.UserRow, input: ReportInput, photos: Buffer[], uploadsDir: string): Promise<SubmitResult> {
   requireCitizen(user);
   const existing = ctx.db.select().from(s.incidents).where(eq(s.incidents.idempotencyKey, input.idempotencyKey)).get();
-  if (existing && existing.reporterId === user.id) return { id: existing.id, duplicate: true, neighboursAsked: 0 };
+  if (existing) {
+    if (existing.reporterId !== user.id) throw badRequest({ field: "idempotencyKey" });
+    return { id: existing.id, duplicate: true, neighboursAsked: 0 };
+  }
 
   const cat = precheck(ctx, user, input, photos.length);
   const urls = await Promise.all(photos.map((p) => savePhoto(uploadsDir, p)));
+  let result: SubmitResult;
   try {
-    return await write(ctx, (fx) => insertIncident(ctx, fx, user, cat, input, urls));
+    result = await write(ctx, (fx) => insertIncident(ctx, fx, user, cat, input, urls));
   } catch (err) {
     await deletePhotos(uploadsDir, urls);
     throw err;
   }
+  // A retry that raced the first request (both were encoding photos) loses here, cleanly.
+  if (result.duplicate) await deletePhotos(uploadsDir, urls);
+  return result;
 }
 
 function insertIncident(ctx: Ctx, fx: Effects, user: s.UserRow, cat: s.CategoryRow, input: ReportInput, photoUrls: string[]): SubmitResult {
+  // Checked again inside the transaction: the first check ran before the (async) photo work.
+  const existing = ctx.db.select().from(s.incidents).where(eq(s.incidents.idempotencyKey, input.idempotencyKey)).get();
+  if (existing) {
+    if (existing.reporterId !== user.id) throw badRequest({ field: "idempotencyKey" });
+    return { id: existing.id, duplicate: true, neighboursAsked: 0 };
+  }
   const areas = ctx.db.select().from(s.areas).all();
   const area = nearestArea(input, areas);
   const now = ctx.clock.iso();
@@ -200,7 +213,12 @@ export async function vote(ctx: Ctx, user: s.UserRow, incidentId: string, input:
     touch(ctx, fx, inc, { confirmCount: confirms, disputeCount: disputes, verification: next });
 
     if (next !== before) {
-      const note = next === "verified" ? { key: "confirmedBy", params: { count: confirms } } : { key: "disputedBy", params: { count: disputes } };
+      const note =
+        next === "verified"
+          ? { key: "confirmedBy", params: { count: confirms } }
+          : next === "disputed"
+            ? { key: "disputedBy", params: { count: disputes } }
+            : { key: "disputeCleared", params: { count: confirms } };
       logEvent(ctx, { incidentId: inc.id, kind: "verification", from: before, to: next, actor: "community", actorId: null, note });
       if (next === "verified") {
         notify(ctx, fx, { userId: inc.reporterId, type: "status_change", key: "status_verified", params: { count: confirms, categoryId: inc.categoryId, areaId: inc.areaId }, incidentId: inc.id });

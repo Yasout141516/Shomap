@@ -109,6 +109,7 @@ export function staffRoutes(app: FastifyInstance, ctx: Ctx) {
     const { hours } = z.object({ hours: z.number().min(1).max(24 * 14).default(72) }).parse(req.body ?? {});
     ctx.clock.advanceHours(hours);
     const swept = await sweep(ctx);
+    ctx.rt.broadcast("demo:clock");
     return { clockOffsetHours: ctx.clock.offsetHours, ...swept };
   });
 

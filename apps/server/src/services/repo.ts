@@ -122,7 +122,8 @@ export function statusEvents(db: DB, incident: s.IncidentRow, viewer: Viewer): S
     .select()
     .from(s.statusEvents)
     .where(eq(s.statusEvents.incidentId, incident.id))
-    .orderBy(asc(s.statusEvents.createdAt), asc(s.statusEvents.id))
+    // Ties (several events in one write share a timestamp) keep insertion order.
+    .orderBy(asc(s.statusEvents.createdAt), asc(sql`rowid`))
     .all();
   const actors = usersById(db, events.map((e) => e.actorId).filter((x): x is string => !!x));
   const authorityIds = [...actors.values()].map((u) => u.authorityId).filter((x): x is string => !!x);

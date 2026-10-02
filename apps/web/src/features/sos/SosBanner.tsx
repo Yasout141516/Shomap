@@ -43,10 +43,16 @@ export function SosBanner() {
     if (justFound) {
       shown.current.delete(justFound.id);
       setFound(justFound);
-      const tm = window.setTimeout(() => setFound(null), 20_000);
-      return () => window.clearTimeout(tm);
     }
   }, [relevant, incidents.data]);
+
+  // Its own timer, keyed on which alert was found, so unrelated live updates don't cancel it.
+  const foundId = found?.id;
+  useEffect(() => {
+    if (!foundId) return;
+    const tm = window.setTimeout(() => setFound(null), 20_000);
+    return () => window.clearTimeout(tm);
+  }, [foundId]);
 
   useEffect(() => {
     if (relevant.length) setCollapsed(false);

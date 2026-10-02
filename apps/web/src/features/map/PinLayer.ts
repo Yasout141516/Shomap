@@ -3,6 +3,7 @@ import Supercluster from "supercluster";
 import { HOUR_MS, URGENCIES, URGENCY_ORDER, type IncidentDTO, type Urgency } from "@shomap/shared";
 import { pinSvg, URGENCY_COLOR } from "../../ui/pin";
 import { isDone } from "./filters";
+import { serverNow } from "../../lib/clock";
 import { categoryIconSvg } from "../../ui/icons";
 
 interface PinProps {
@@ -80,7 +81,7 @@ export class PinLayer {
     const zoom = Math.round(this.map.getZoom());
     const clusters = this.index.getClusters([b.getWest() - 0.01, b.getSouth() - 0.01, b.getEast() + 0.01, b.getNorth() + 0.01], zoom);
     const want = new Map<string, { lngLat: [number, number]; sig: string; build: () => HTMLElement }>();
-    const now = Date.now();
+    const now = serverNow();
 
     for (const c of clusters) {
       const [lng, lat] = c.geometry.coordinates as [number, number];

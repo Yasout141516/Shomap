@@ -51,6 +51,8 @@ export interface MetaDTO {
   categories: CategoryDTO[];
   authorities: AuthorityDTO[];
   demoMode: boolean;
+  /** Server clock minus real time (non-zero after a demo fast-forward); clients add it to Date.now(). */
+  clockOffsetMs: number;
   config: {
     confirmThreshold: number;
     reopenThreshold: number;
@@ -236,4 +238,6 @@ export interface ServerEvents {
   "comment:created": (comment: CommentDTO) => void;
   "notification:new": (n: NotificationDTO) => void;
   "demo:reset": () => void;
+  /** The demo clock moved (fast-forward): refetch the clock offset and everything time-based. */
+  "demo:clock": () => void;
 }

@@ -15,10 +15,13 @@ export interface Ctx {
 /**
  * Runs `fn` in one SQLite transaction, then pushes the collected effects to sockets.
  * better-sqlite3 is synchronous, so the whole write is atomic and serialised (Review Focus 1).
+ * Once committed, the write has succeeded: a broadcast failure is logged, never thrown, so
+ * callers don't roll back work (e.g. delete photos) that is already saved. Clients catch up on
+ * their next reconnect or refetch.
  */
 export async function write<T>(ctx: Ctx, fn: (fx: Effects) => T): Promise<T> {
   const fx = new Effects();
   const result = ctx.sqlite.transaction(() => fn(fx))();
-  await ctx.rt.flush(fx);
+  await ctx.rt.flush(fx).catch((err: unknown) => console.error("realtime flush failed", err));
   return result;
 }

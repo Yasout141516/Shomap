@@ -94,6 +94,7 @@
     "referredCritical": "Critical report. Referred immediately.",
     "referredAdmin": "Referred by ShoMap moderators.",
     "confirmedBy": "Confirmed by {{count}} neighbours.",
+    "disputeCleared": "The dispute was cleared: {{count}} neighbours confirmed.",
     "disputedBy": "Disputed by {{count}} neighbours.",
     "reopened": "Reopened: {{count}} neighbours say it is still happening.",
     "autoClosed": "Closed after {{hours}} hours with no objection.",

@@ -40,10 +40,13 @@ export function RealtimeBridge() {
   const { toast } = useToast();
   const me = useMe();
   const text = useNotificationText();
+  // Lives outside the handler effect: re-subscribing (language change, meta load) must not make
+  // the next reconnect look like a first connect and skip the catch-up refetch.
+  const connectedBefore = useRef(false);
 
   useEffect(() => {
     const s = getSocket();
-    let connectedBefore = false;
+    if (s.connected) connectedBefore.current = true;
     let pending = new Set<string>();
     let timer: number | undefined;
     const invalidateSoon = (keys: QueryKey[]) => {
@@ -59,8 +62,8 @@ export function RealtimeBridge() {
       connect: () => {
         setConnected(true);
         // A *re*connect may have missed events (Review Focus 3); the first connect hasn't.
-        if (connectedBefore) void qc.invalidateQueries();
-        connectedBefore = true;
+        if (connectedBefore.current) void qc.invalidateQueries();
+        connectedBefore.current = true;
       },
       disconnect: () => setConnected(false),
       "incident:created": (inc: IncidentDTO) => onIncident(inc),
@@ -75,6 +78,8 @@ export function RealtimeBridge() {
         qc.clear();
         void qc.invalidateQueries();
       },
+      // Fast-forward: new clock offset (meta) and every time-based view.
+      "demo:clock": () => void qc.invalidateQueries(),
     } as const;
     function onIncident(inc: IncidentDTO) {
       upsertIncident(qc, inc);

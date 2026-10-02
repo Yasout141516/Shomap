@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, inArray, isNull, ne, or } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, isNull, ne, or, sql } from "drizzle-orm";
 import {
   ACTIVE_STATUSES,
   DAY_MS,
@@ -104,7 +104,7 @@ export function adminQueue(ctx: Ctx, viewer: Viewer): QueueItemDTO[] {
 }
 
 export function eventLog(ctx: Ctx, limit = 50): EventLogDTO[] {
-  const events = ctx.db.select().from(s.statusEvents).orderBy(desc(s.statusEvents.createdAt)).limit(limit).all();
+  const events = ctx.db.select().from(s.statusEvents).orderBy(desc(s.statusEvents.createdAt), desc(sql`rowid`)).limit(limit).all();
   const actors = usersById(ctx.db, events.map((e) => e.actorId).filter((x): x is string => !!x));
   return events.map((e) => ({
     id: e.id,
