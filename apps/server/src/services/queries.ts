@@ -118,11 +118,12 @@ export function eventLog(ctx: Ctx, limit = 50): EventLogDTO[] {
 /** Dhaka local date (UTC+6) for daily buckets. */
 const dhakaDate = (iso: string) => new Date(Date.parse(iso) + 6 * 3_600_000).toISOString().slice(0, 10);
 
-export function dashboard(ctx: Ctx, user: s.UserRow | null, scope: DashboardScope, zoneId?: string): DashboardDTO {
+export function dashboard(ctx: Ctx, user: s.UserRow | null, scope: DashboardScope, zoneId?: string, areaId?: string): DashboardDTO {
   let inScope: (r: s.IncidentRow) => boolean = () => true;
   let scopeLabel = { en: "All of Dhaka", bn: "সমগ্র ঢাকা" };
-  if (scope === "home" && user?.homeAreaId) {
-    const area = ctx.db.select().from(s.areas).where(eq(s.areas.id, user.homeAreaId)).get();
+  const homeId = areaId ?? user?.homeAreaId;
+  if (scope === "home" && homeId) {
+    const area = ctx.db.select().from(s.areas).where(eq(s.areas.id, homeId)).get();
     if (area) {
       inScope = (r) => r.areaId === area.id;
       scopeLabel = { en: area.nameEn, bn: area.nameBn };

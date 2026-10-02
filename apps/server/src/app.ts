@@ -46,16 +46,14 @@ export async function buildApp(opts: BuildOptions): Promise<{ app: FastifyInstan
     await app.register(fastifyStatic, { root: cfg.offlineDir, prefix: "/offline/", decorateReply: false });
   }
   const hasWeb = fs.existsSync(path.join(cfg.webDist, "index.html"));
-  if (hasWeb) {
-    await app.register(fastifyStatic, { root: cfg.webDist, prefix: "/", wildcard: false });
-    // Single-page app: unknown non-API GETs get index.html.
-    app.setNotFoundHandler((req, reply) => {
-      if (req.method === "GET" && !req.url.startsWith("/api/") && !req.url.startsWith("/socket.io")) {
-        return reply.type("text/html").sendFile("index.html");
-      }
-      return reply.status(404).send(apiError("not_found"));
-    });
-  }
+  if (hasWeb) await app.register(fastifyStatic, { root: cfg.webDist, prefix: "/", wildcard: false });
+  // Single-page app: unknown non-API GETs get index.html; everything else is a JSON 404.
+  app.setNotFoundHandler((req, reply) => {
+    if (hasWeb && req.method === "GET" && !req.url.startsWith("/api/") && !req.url.startsWith("/socket.io")) {
+      return reply.type("text/html").sendFile("index.html");
+    }
+    return reply.status(404).send(apiError("not_found"));
+  });
 
   return { app, ctx };
 }

@@ -1,0 +1,48 @@
+/* PRD §12.1 "Civic & calm" tokens. Red is reserved for SOS / Critical. */
+:root {
+  --brand: #006a4e;
+  --brand-ink: #004d38;
+  --brand-wash: #e3f0ea;
+  --sos: #f42a41;
+  --sos-ink: #b3132a;
+  --sos-wash: #fde8ea;
+  --paper: #faf8f3;
+  --surface: #ffffff;
+  --sunk: #f2efe7;
+  --ink: #1f2421;
+  --ink-muted: #5b635e;
+  --line: #e4e1d8;
+  --official: #1e4e8c;
+  --official-wash: #e6eef9;
+  --focus: #006a4e;
+
+  /* Urgency (PRD §12.2) — always paired with shape + label */
+  --u-low: #6b7f99;
+  --u-medium: #c98a00;
+  --u-high: #d9560b;
+  --u-critical: #f42a41;
+
+  --font-latin: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-bangla: "Hind Siliguri", "Inter", system-ui, sans-serif;
+  --font: var(--font-latin);
+
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+  --radius: 8px;
+  --radius-pill: 999px;
+  --shadow: 0 6px 24px rgba(31, 36, 33, 0.12);
+
+  --topbar-h: 56px;
+  --bottombar-h: 64px;
+  --panel-w: 480px;
+  --list-w: 360px;
+}
+
+:root[lang="bn"] {
+  --font: var(--font-bangla);
+}

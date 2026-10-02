@@ -252,7 +252,7 @@ export function publicRoutes(app: FastifyInstance, ctx: Ctx) {
 
   // ---- Dashboard (FR-7)
   app.get("/api/dashboard", async (req) => {
-    const q = z.object({ scope: z.enum(DASHBOARD_SCOPES).default("all"), zoneId: z.string().optional() }).parse(req.query);
-    return { dashboard: dashboard(ctx, currentUser(req, db), q.scope, q.zoneId) };
+    const q = z.object({ scope: z.enum(DASHBOARD_SCOPES).default("all"), zoneId: z.string().optional(), areaId: z.string().optional() }).parse(req.query);
+    return { dashboard: dashboard(ctx, currentUser(req, db), q.scope, q.zoneId, q.areaId) };
   });
 }

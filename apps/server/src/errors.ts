@@ -37,5 +37,4 @@ export function registerErrorHandler(app: FastifyInstance) {
     req.log.error({ err }, "unhandled error");
     return reply.status(500).send(apiError("internal"));
   });
-  app.setNotFoundHandler((req, reply) => reply.status(404).send(apiError("not_found")));
 }
