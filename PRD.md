@@ -9,7 +9,7 @@
 | **Document status** | v0.3: CEO and design reviews complete, ready to build against |
 | **Build window** | About 1 week |
 | **Scope** | Hackathon demo. Functional end to end on seeded Dhaka data; not production. |
-| **Tech stack** | **Not decided.** This PRD is stack-agnostic on purpose. |
+| **Tech stack** | Decided 2026-10-02: Vite + React + TypeScript, Node (Fastify + Socket.IO), SQLite, MapLibre with offline PMTiles. See `docs/superpowers/specs/2026-10-02-shomap-demo-tech-stack-design.md` |
 | **Humanity 101 principles** | Compassion · Integrity · Empathy |
 | **Last updated** | 2026-09-30 |
 
@@ -128,7 +128,7 @@ Priority: **P0** = must work in the demo. **P1** = should work; cut only if behi
 |---|---|---|
 | FR-2.1 | A 3-step report flow: **(1) Category → (2) Location → (3) Details** | P0 |
 | FR-2.2 | Choosing a **blocked category** shows the hotline redirect (tap-to-call 999 / 109) and ends the flow without creating a pin | P0 |
-| FR-2.3 | Location defaults to the device's GPS. The user can drag the pin or search a seeded area name. The area is derived from the pin with no external geocoder | P0 |
+| FR-2.3 | Location defaults to the device's GPS where the browser allows it (the presenting laptop, on `localhost`). On phones over the LAN, the pin starts at the user's home-area centroid. The user can drag the pin or search a seeded area name. The area is derived from the pin with no external geocoder | P0 |
 | FR-2.4 | Required fields: category, location, short description (10–280 characters). Optional fields: up to 3 photos (≤ 5 MB each), time it happened (defaults to now), urgency adjusted ±1 level | P0 |
 | FR-2.5 | **Anonymous toggle** (see §6.9). It's on by default for Extortion and Public harassment | P0 |
 | FR-2.6 | On submit, the incident appears on the map in **under 5 seconds** for every connected user, with status `open` / `unverified` | P0 |
@@ -281,12 +281,12 @@ See diagram: [05 SOS alert sequence](diagrams/05-sos-alert-sequence.png)
 | NFR-5 | **Localisation** | Full EN/BN parity. The Bangla font renders conjuncts correctly (e.g. Noto Sans Bengali / Hind Siliguri). Layouts tolerate text about 30% longer |
 | NFR-6 | **Privacy** | Anonymous reporter identity never appears in any public API response. Photo EXIF is stripped. SOS child photos are hidden once found or expired. No real personal data in the seed |
 | NFR-7 | **Security** | Role-based authorization is checked server-side on every write. Input is validated and sanitised (no XSS in comments). Rate limits per FR-2.8. Secrets are not committed |
-| NFR-8 | **Reliability (demo)** | The demo must not depend on any paid or fragile third-party API except map tiles. Map tiles have a fallback (a cached or offline style, or a static screenshot mode). The live demo has a rehearsed backup video |
+| NFR-8 | **Reliability (demo): fully offline** | The demo has **no runtime network dependency**: map tiles (local PMTiles extract of Dhaka), fonts and icons are all bundled. If the map file is missing, pins and area labels render on a plain background. The live demo also has a rehearsed backup video |
 | NFR-9 | **Integrity / auditability** | Every state change is recorded in `STATUS_EVENT` with the actor and time, and is never deleted. "Removed" is a soft delete |
 | NFR-10 | **Usability** | A first-time user can file a report in ≤ 60 s with no instructions. At most 3 required fields |
 | NFR-11 | **Observability (demo-grade)** | Server errors are logged with request IDs. The admin view shows a live event log (last 50 events) to prove activity during the demo. Every user-facing error has a clear message and a retry (§9) |
 | NFR-12 | **Portability** | Stack-agnostic. Must run in current Chrome (Android and desktop) and Safari (iOS). No native app required |
-| NFR-13 | **Deployability** | One command or action seeds or resets the data. Deployed at a public URL judges can open on their own phones |
+| NFR-13 | **Deployability** | One command (`npm run demo`) builds, seeds and starts the app on the laptop. Judges open it from their phones over the laptop's hotspot or LAN, using the LAN URL or a QR code on the `/demo` panel. Reset is one action |
 
 ## 8. Out of scope (for the demo)
 
