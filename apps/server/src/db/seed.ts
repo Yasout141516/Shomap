@@ -179,7 +179,8 @@ export function seed(db: DB, nowMs: number): SeedSummary {
           verification = "disputed";
           confirms = Math.floor(R() * 2);
           disputes = 3 + Math.floor(R() * 2);
-        } else if (roll < 0.7) {
+        } else if (roll < 0.7 || hoursAgo > 6 * 24) {
+          // Older reports are verified, so the 7-day unverified sweeper doesn't remove seed data.
           verification = "verified";
           confirms = 3 + Math.floor(R() * 6);
           disputes = R() < 0.3 ? 1 : 0;

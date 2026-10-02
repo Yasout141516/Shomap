@@ -207,6 +207,8 @@ export interface EventLogDTO {
 
 export interface DemoInfoDTO {
   lanUrls: string[];
+  /** SVG markup of a QR code for the first LAN URL. */
+  qrSvg: string | null;
   clockOffsetHours: number;
   users: { id: string; displayName: string; role: Role; homeAreaId: string | null; authorityId: string | null }[];
 }
