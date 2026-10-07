@@ -89,6 +89,7 @@ function UnreadBadge() {
 
 export function Shell() {
   const { t } = useI18n();
+  const meta = useMeta();
   const { openReport, reportOpen, connected } = useApp();
   const { me } = useSession();
   const loc = useLocation();
@@ -127,6 +128,11 @@ export function Shell() {
         </div>
       </header>
 
+      {meta.data?.publicDemo ? (
+        <div className="public-banner" role="note">
+          {t("demo.publicBanner")} <NavLink to="/demo">{t("demo.publicBannerLink")}</NavLink>
+        </div>
+      ) : null}
       <SosBanner />
       {!connected ? (
         <div className="reconnecting" role="status">

@@ -82,6 +82,7 @@ export function publicRoutes(app: FastifyInstance, ctx: Ctx) {
       .map(({ sort: _s, ...c }) => c),
     authorities: db.select().from(s.authorities).all(),
     demoMode: ctx.cfg.demoMode,
+    publicDemo: ctx.cfg.publicDemo,
     clockOffsetMs: ctx.clock.nowMs() - Date.now(),
     config: {
       confirmThreshold: ctx.cfg.confirmThreshold,

@@ -14,6 +14,8 @@ export const config = {
   port: Number(process.env.PORT ?? 3000),
   host: process.env.HOST ?? "0.0.0.0",
   demoMode: process.env.DEMO_MODE !== "0",
+  /** Hosted on the public internet (e.g. Render): show the demo banner, trust the proxy, public QR URL. */
+  publicDemo: process.env.PUBLIC_DEMO === "1",
   demoOtp: "1234",
   sessionSecret: process.env.SESSION_SECRET ?? "shomap-demo-secret-change-me-0123456789",
   dataDir: process.env.SHOMAP_DATA_DIR ?? path.join(REPO_ROOT, "data"),

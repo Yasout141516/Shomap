@@ -51,6 +51,8 @@ export interface MetaDTO {
   categories: CategoryDTO[];
   authorities: AuthorityDTO[];
   demoMode: boolean;
+  /** Running on a public host: show the "public demo" banner. */
+  publicDemo: boolean;
   /** Server clock minus real time (non-zero after a demo fast-forward); clients add it to Date.now(). */
   clockOffsetMs: number;
   config: {

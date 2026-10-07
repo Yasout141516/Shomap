@@ -9,6 +9,10 @@ import { config } from "./config.js";
 import { sweep } from "./services/actions.js";
 import { lanUrls } from "./routes/staff.js";
 
+if (config.sessionSecret.startsWith("shomap-demo-secret") && config.publicDemo) {
+  console.warn("WARNING: SESSION_SECRET is the built-in default. Set it in the host's environment.");
+}
+
 const logFile = path.join(config.dataDir, "logs", "server.log");
 fs.mkdirSync(path.dirname(logFile), { recursive: true });
 

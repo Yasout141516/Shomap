@@ -26,7 +26,8 @@ export interface BuildOptions {
 export async function buildApp(opts: BuildOptions): Promise<{ app: FastifyInstance; ctx: Ctx }> {
   const cfg: Config = { ...defaultConfig, ...opts.cfg };
   const clock = opts.clock ?? new Clock();
-  const app = Fastify({ logger: opts.logger ?? false, bodyLimit: 1024 * 1024 });
+  // Behind a hosting proxy (Render), trust X-Forwarded-* so request host/protocol are the public ones.
+  const app = Fastify({ logger: opts.logger ?? false, bodyLimit: 1024 * 1024, trustProxy: cfg.publicDemo });
 
   await app.register(cookie, { secret: cfg.sessionSecret });
   await app.register(multipart, { limits: { fileSize: cfg.maxPhotoBytes, files: cfg.maxPhotos, fields: 4 } });

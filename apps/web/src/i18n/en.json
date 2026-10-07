@@ -444,7 +444,9 @@
       "Shirin (Mirpur) sends a missing-child SOS. Arif, watching Mirpur 10, gets the banner.",
       "Arif posts a sighting. Shirin marks the child found. Everyone gets \"Found safe\".",
       "Open the dashboard: Farmgate's high-urgency count went up."
-    ]
+    ],
+    "publicBanner": "Public demo: data is sample data and resets when the server restarts. Log in with any 01XXXXXXXXX number and code 1234, or pick an account in Demo controls.",
+    "publicBannerLink": "Demo controls"
   },
   "errors": {
     "bad_request": "Something in the form needs fixing.",

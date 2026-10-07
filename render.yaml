@@ -1,0 +1,26 @@
+# Render Blueprint: deploys ShoMap as one public web service from this GitHub repo.
+# Render: New → Blueprint → pick this repo → Apply. Every push to main redeploys.
+services:
+  - type: web
+    name: shomap
+    runtime: node
+    plan: free
+    region: singapore
+    branch: main
+    # The Dhaka map file isn't in git; the build downloads it (internet is available at build time).
+    buildCommand: npm ci && npm run fetch:map && npm run build
+    startCommand: npm run start -w @shomap/server
+    healthCheckPath: /api/meta
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 22.14.0
+      # Signs login cookies. Render generates a random value once and keeps it.
+      - key: SESSION_SECRET
+        generateValue: true
+      # Demo controls (account switcher, reset) stay on so visitors can try every role.
+      - key: DEMO_MODE
+        value: "1"
+      # Shows the "public demo" banner, trusts Render's proxy, and puts the public URL in the QR code.
+      - key: PUBLIC_DEMO
+        value: "1"

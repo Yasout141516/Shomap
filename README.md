@@ -50,6 +50,21 @@ Login is a mock: any `01XXXXXXXXX` number, and the code is always **1234**. The 
 5. Judges scan the QR code on `/demo`. On phones over plain `http`, GPS is unavailable, so the report flow starts at the user's home area with a draggable pin.
 6. Record a backup video of the full script.
 
+## Public deployment (Render, from GitHub)
+
+The same app can also run on the public internet. [render.yaml](render.yaml) describes the service:
+
+1. Sign in at [render.com](https://render.com) with GitHub.
+2. **New → Blueprint**, pick this repo, then **Apply**.
+3. Wait for the first build (about 5 minutes). It installs, downloads the Dhaka map and builds the web app. The URL looks like `https://shomap.onrender.com`.
+
+Free-tier behaviour:
+- The service sleeps after about 15 minutes idle, so the first visit takes 30–60 s to wake.
+- The disk is temporary, so data resets to the seeded demo on every restart or deploy. The banner tells visitors this.
+- Every push to `main` redeploys automatically.
+
+`PUBLIC_DEMO=1` turns on the banner, proxy trust, and the public URL in the `/demo` QR code. Leave it unset for the offline laptop demo.
+
 ## Scripts
 
 | Command | What it does |

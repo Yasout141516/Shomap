@@ -173,6 +173,19 @@
 .fab:hover {
   background: var(--brand-ink);
 }
+.public-banner {
+  flex: none;
+  background: #fbf2dc;
+  color: #5c3e00;
+  font-size: 13px;
+  padding: 6px var(--s4);
+  text-align: center;
+  border-bottom: 1px solid var(--line);
+}
+.public-banner a {
+  color: inherit;
+  font-weight: 600;
+}
 .reconnecting {
   position: fixed;
   top: calc(var(--topbar-h) + 8px);

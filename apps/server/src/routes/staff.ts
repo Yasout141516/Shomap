@@ -69,9 +69,10 @@ export function staffRoutes(app: FastifyInstance, ctx: Ctx) {
     if (!ctx.cfg.demoMode) throw new HttpError(404, "demo_only");
   };
 
-  app.get("/api/demo/info", async (): Promise<DemoInfoDTO> => {
+  app.get("/api/demo/info", async (req): Promise<DemoInfoDTO> => {
     demoOnly();
-    const urls = lanUrls(ctx.cfg.port);
+    // Hosted: the QR should open the public address; on a laptop, the hotspot/LAN addresses.
+    const urls = ctx.cfg.publicDemo ? [`${req.protocol}://${req.host}`] : lanUrls(ctx.cfg.port);
     const users = db
       .select()
       .from(s.users)
