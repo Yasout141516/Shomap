@@ -2,6 +2,10 @@
 
 **Report. Receive. Respond.** A community-powered platform where people in Bangladesh report, verify and track everyday incidents together. This repo is the hackathon demo by Team Snoopy.
 
+**Live demo: https://shomap.onrender.com**
+
+It's a free instance, so the first visit after idle takes 30–60 s to wake. Log in with any `01XXXXXXXXX` number and code `1234`, or open **Demo controls** to switch between the citizen, authority and moderator accounts. Data is sample data and resets when the server restarts.
+
 - Product requirements: [PRD.md](PRD.md)
 - Tech design: [docs/superpowers/specs/2026-10-02-shomap-demo-tech-stack-design.md](docs/superpowers/specs/2026-10-02-shomap-demo-tech-stack-design.md)
 - Diagrams (including the ERD): [diagrams/](diagrams/)
