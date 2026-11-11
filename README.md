@@ -6,6 +6,17 @@
 
 It's a free instance, so the first visit after idle takes 30–60 s to wake. Log in with any `01XXXXXXXXX` number and code `1234`, or open **Demo controls** to switch between the citizen, authority and moderator accounts. Data is sample data and resets when the server restarts.
 
+## Videos
+
+| What ShoMap is (2:22) | How to use it (4:05) |
+|---|---|
+| [![ShoMap explainer](media/shomap-explainer-poster.jpg)](media/shomap-explainer.mp4) | [![ShoMap walkthrough](media/shomap-how-to-use-poster.jpg)](media/shomap-how-to-use.mp4) |
+| The problem, the idea, and one incident followed through the full loop: report → verify → refer → respond. | A narrated walkthrough of the real app: map, reporting, verification, the authority console, the missing-child SOS, alerts, watch zones, dashboard, Bangla, moderation. |
+
+The statistics in the videos come from the Dhaka Tribune (23 Aug 2026; the Dhaka Metropolitan Police list of 1,387 active muggers) and the Police Headquarters release reported by Prothom Alo (20 Sep 2026; 15,717 children reported missing, January to July). Names, times and the SOS child are illustrative demo data.
+
+## Docs
+
 - Product requirements: [PRD.md](PRD.md)
 - Tech design: [docs/superpowers/specs/2026-10-02-shomap-demo-tech-stack-design.md](docs/superpowers/specs/2026-10-02-shomap-demo-tech-stack-design.md)
 - Diagrams (including the ERD): [diagrams/](diagrams/)
