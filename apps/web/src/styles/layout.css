@@ -576,6 +576,9 @@
   .modal-backdrop {
     padding: 0;
     place-items: stretch;
+    /* Without this the grid row grows to the modal's content, so a tall form pushes its footer
+       (e.g. "Send report") below the screen with no way to scroll to it. */
+    grid-template-rows: minmax(0, 1fr);
   }
   .modal,
   .modal-wide {
