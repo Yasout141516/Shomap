@@ -8,3 +8,6 @@ test-results/
 playwright-report/
 .vite/
 .cache/
+
+# local video working files (published copies live in media/)
+video/
